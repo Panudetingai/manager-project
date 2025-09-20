@@ -51,7 +51,8 @@ class AuthService {
         const { data, error } = await AuthService.supabase.auth.signInWithOAuth({
             provider: AuthService.provider,
             options: {
-                redirectTo: `http://localhost:3000/api/auth/callback`
+                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
+                scopes: 'email'
             }
         });
 

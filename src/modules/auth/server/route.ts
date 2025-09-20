@@ -41,7 +41,6 @@ const auth_callback = new Elysia().get(
         }
       }
     }
-    // return the user to an error page with instructions
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
   }
 );

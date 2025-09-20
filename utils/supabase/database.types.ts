@@ -44,12 +44,87 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding: {
+        Row: {
+          created_at: string
+          description: Json
+          id: number
+          user_id: string | null
+          user_type: string | null
+          workspace: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: Json
+          id?: number
+          user_id?: string | null
+          user_type?: string | null
+          workspace?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: Json
+          id?: number
+          user_id?: string | null
+          user_type?: string | null
+          workspace?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onborad_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+          workspace_icon: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+          workspace_icon?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+          workspace_icon?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_onboarding_and_workspace: {
+        Args: {
+          p_description: Json
+          p_user_id: string
+          p_user_type: string
+          p_workspace_name: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       user_roles: "admin" | "user"

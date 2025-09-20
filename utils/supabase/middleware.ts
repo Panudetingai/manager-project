@@ -1,12 +1,15 @@
+import { workspaceRedirect } from "@/app/dashboard/[project]/middleware";
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import pathsConfig from "../../config/app.router";
+import { Database } from "./database.types";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -33,27 +36,72 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (
-    user &&
-    (request.nextUrl.pathname.startsWith("/auth/sign-in") ||
-      request.nextUrl.pathname.startsWith("/auth/sign-up"))
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
-  }
-
+  // ถ้าไม่ได้ login และเข้า path ที่ต้อง login
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith("/auth/sign-in") &&
-    !request.nextUrl.pathname.startsWith("/auth/sign-up") &&
-    !request.nextUrl.pathname.startsWith("/error") &&
-    request.nextUrl.pathname.startsWith("/dashboard/workspace")
+    request.nextUrl.pathname !== pathsConfig.auth.signIn &&
+    request.nextUrl.pathname !== pathsConfig.auth.signUp &&
+    (request.nextUrl.pathname.startsWith("/dashboard") ||
+      request.nextUrl.pathname.startsWith("/onboarding"))
   ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/sign-in";
-    return NextResponse.redirect(url);
+    url.pathname = pathsConfig.auth.signIn;
+    return NextResponse.redirect(url, 302);
   }
 
+  // ถ้า login แล้วเข้า sign-in หรือ sign-up ให้ไป workspace
+  if (
+    user &&
+    (request.nextUrl.pathname === pathsConfig.auth.signIn ||
+      request.nextUrl.pathname === pathsConfig.auth.signUp)
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/dashboard/${"workspace"}`;
+    return NextResponse.redirect(url, 302);
+  }
+
+  // ตรวจสอบ onboarding เฉพาะเมื่อ login แล้ว
+  let onboarded;
+  if (user) {
+    const { data } = await supabase
+      .from("onboarding")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+    onboarded = data;
+  }
+
+  // ตรวจสอบ workspace เฉพาะเมื่อ login แล้ว
+
+  // ถ้า login แล้ว ยังไม่ onboarded และไม่ได้อยู่หน้า onboarding ให้ไป onboarding
+  if (
+    user &&
+    (!onboarded || !onboarded.workspace) &&
+    request.nextUrl.pathname !== "/onboarding"
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/onboarding";
+    return NextResponse.redirect(url, 302);
+  } else {
+    const url = request.nextUrl.clone();
+    if (url.pathname === "/onboarding") {
+      url.pathname = `/dashboard`;
+      return NextResponse.redirect(url, 302);
+  }
+
+  }
+  // ถ้า login แล้ว onboarded แล้ว และไม่ได้อยู่ workspace ให้ไป workspace
+
+  if (
+    user &&
+    onboarded &&
+    onboarded.workspace &&
+    request.nextUrl.pathname.startsWith("/dashboard")
+  ) {
+    const result = await workspaceRedirect(request);
+    if (result) return result;
+  }
+
+  // ไม่ต้อง redirect
   return supabaseResponse;
 }

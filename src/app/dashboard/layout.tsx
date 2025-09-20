@@ -8,10 +8,8 @@ export default function LayoutDashboardProject({
 }) {
   return (
     <SidebarProvider>
-        <AppSidebar />
-        <main className="m-6 w-full p-6 rounded-sm">
-            {children}
-        </main>
+      <AppSidebar />
+      <main className="m-6 w-full p-6 rounded-sm">{children}</main>
     </SidebarProvider>
   );
 }
