@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_ROUTE } from "../const/app-route";
 import { SidebarBanner } from "./sidebar-banner";
+import { SidebarAccount } from "./sidebar-footer";
 
 export async function AppSidebar() {
   return (
@@ -42,7 +43,9 @@ export async function AppSidebar() {
         </SidebarGroup>
         <SidebarGroup />
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarAccount />
+        </SidebarFooter>
     </Sidebar>
   );
 }
