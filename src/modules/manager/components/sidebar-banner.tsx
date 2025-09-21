@@ -22,6 +22,7 @@ import { getUserClient } from "@/lib/supabase/getUser-client";
 import { useQuery } from "@tanstack/react-query";
 import * as LucideIcons from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { elysia } from "../../../../config/eylsia.config";
 import { createClient } from "../../../../utils/supabase/client";
 import CreateWorkspaceForm from "./create-workspace";
 
@@ -45,10 +46,8 @@ export function SidebarBanner() {
   const { data: workspaces } = useQuery({
     queryKey: ["workspace", user?.id],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("workspace")
-        .select("name, workspace_icon")
-        .eq("user_id", user!.id);
+      const res = await elysia.api.workspaces.get();
+      const data = res.data;
       return data;
     },
     enabled: !!user?.id,
@@ -87,6 +86,8 @@ export function SidebarBanner() {
     );
   }
   if (userError || !user) return null;
+
+  console.log(workspaces)
 
   return (
     <Dialog>

@@ -9,7 +9,6 @@ class AuthService {
 
     constructor(supabaseClient: ReturnType<typeof createServerClient<Database>>) {
         AuthService.supabase = supabaseClient;
-        
     }
 
     /**

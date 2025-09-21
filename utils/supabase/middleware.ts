@@ -41,8 +41,10 @@ export async function updateSession(request: NextRequest) {
     !user &&
     request.nextUrl.pathname !== pathsConfig.auth.signIn &&
     request.nextUrl.pathname !== pathsConfig.auth.signUp &&
-    (request.nextUrl.pathname.startsWith("/dashboard") ||
-      request.nextUrl.pathname.startsWith("/onboarding"))
+    (request.nextUrl.pathname.startsWith(
+      pathsConfig.app.workspaceDashboard.replace("[workspace]", "")
+    ) ||
+      request.nextUrl.pathname.startsWith(pathsConfig.app.onboarding))
   ) {
     const url = request.nextUrl.clone();
     url.pathname = pathsConfig.auth.signIn;
@@ -56,7 +58,10 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname === pathsConfig.auth.signUp)
   ) {
     const url = request.nextUrl.clone();
-    url.pathname = `/dashboard/${"workspace"}`;
+    url.pathname = pathsConfig.app.workspaceDashboard.replace(
+      "[workspace]",
+      "workspace"
+    );
     return NextResponse.redirect(url, 302);
   }
 
@@ -77,18 +82,20 @@ export async function updateSession(request: NextRequest) {
   if (
     user &&
     (!onboarded || !onboarded.workspace) &&
-    request.nextUrl.pathname !== "/onboarding"
+    request.nextUrl.pathname !== pathsConfig.app.onboarding
   ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/onboarding";
+    url.pathname = pathsConfig.app.onboarding;
     return NextResponse.redirect(url, 302);
   } else {
     const url = request.nextUrl.clone();
-    if (url.pathname === "/onboarding") {
-      url.pathname = `/dashboard`;
+    if (url.pathname === pathsConfig.app.onboarding) {
+      url.pathname = pathsConfig.app.workspaceDashboard.replace(
+        "[workspace]",
+        "workspace"
+      );
       return NextResponse.redirect(url, 302);
-  }
-
+    }
   }
   // ถ้า login แล้ว onboarded แล้ว และไม่ได้อยู่ workspace ให้ไป workspace
 
@@ -96,7 +103,9 @@ export async function updateSession(request: NextRequest) {
     user &&
     onboarded &&
     onboarded.workspace &&
-    request.nextUrl.pathname.startsWith("/dashboard")
+    request.nextUrl.pathname.startsWith(
+      pathsConfig.app.workspaceDashboard.replace("[workspace]", "")
+    )
   ) {
     const result = await workspaceRedirect(request);
     if (result) return result;

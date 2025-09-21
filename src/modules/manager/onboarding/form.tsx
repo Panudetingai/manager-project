@@ -68,8 +68,8 @@ export default function OnboardForm() {
     mutationFn: submitOnboarding,
     onSuccess: () => {
       router.push(
-        pathsConfig.app.dashboard.replace(
-          "[team]",
+        pathsConfig.app.workspaceDashboard.replace(
+          "[workspace]",
           form.getValues("workspaceName")
         )
       );
