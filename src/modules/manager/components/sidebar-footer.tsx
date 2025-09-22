@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/animate-ui/components/radix/sidebar";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -9,8 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { getUserClient } from "@/lib/supabase/getUser-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { LoaderCircle, LogOut } from "lucide-react";
@@ -22,7 +26,8 @@ import { signOut } from "../server/sign-out";
 
 export function SidebarAccount() {
   const router = useRouter();
-const [open, setOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
   const { data: user, isPending } = useQuery({
     queryKey: ["getUser"],
     queryFn: getUserClient,
@@ -33,7 +38,7 @@ const [open, setOpen] = useState(false);
     mutationFn: signOut,
     onSuccess: () => {
       router.refresh();
-    }
+    },
   });
 
   if (isPending) {
@@ -50,7 +55,7 @@ const [open, setOpen] = useState(false);
     <DropdownMenu open={open || isSigningOut} onOpenChange={(v) => setOpen(v)}>
       <DropdownMenuTrigger asChild className="cursor-pointer">
         <SidebarMenuItem>
-          <SidebarMenuButton className="py-6">
+          <SidebarMenuButton className="py-6" size={"lg"}>
             <Image
               className="rounded-sm"
               src={user && user.user_metadata.avatar_url}
@@ -69,7 +74,12 @@ const [open, setOpen] = useState(false);
           </SidebarMenuButton>
         </SidebarMenuItem>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="right" className="w-52" forceMount>
+      <DropdownMenuContent
+        align="end"
+        side={isMobile ? "bottom" : "right"}
+        className="w-52"
+        forceMount
+      >
         {AccountSidebarItems().map((group) => (
           <div key={group.labelGroup}>
             <DropdownMenuGroup>

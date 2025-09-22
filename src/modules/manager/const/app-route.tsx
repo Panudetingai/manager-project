@@ -1,4 +1,4 @@
-import { LayoutDashboard, LucideIcon, Settings2, Users2 } from "lucide-react";
+import { CreditCard, LayoutDashboard, LucideIcon, Settings2, Users2 } from "lucide-react";
 import z from "zod";
 import pathsConfig from "../../../../config/app.router";
 
@@ -31,7 +31,7 @@ export const APP_ROUTE: AppRoute[] = [
     items: [
       {
         label: "Overview",
-        path: "/dashboard/[workspace]",
+        path: pathsConfig.app.workspaceDashboard,
         icon: LayoutDashboard,
         role: "user",
         submenu: [],
@@ -51,40 +51,32 @@ export const APP_ROUTE: AppRoute[] = [
       },
       {
         label: "Settings",
-        path: "/settings/[workspace]",
+        path: pathsConfig.app.workspaceSettingsGeneral,
         icon: Settings2,
         role: "owner",
         submenu: [],
       },
+      {
+        label: "Billing",
+        path: pathsConfig.app.workspaceBilling,
+        icon: CreditCard,
+        role: "owner",
+        submenu: [],
+      }
     ],
   },
-];
-
-export const getAppRouteIsActive = (pathname: string, path: string) => {
-  if (!path) return false;
-
-  // ตัด dynamic segment ออก เช่น /dashboard/[workspace]
-  const dynamicMatch = path.match(/^(\/dashboard\/)\[([^\]]+)\](.*)$/);
-  if (dynamicMatch) {
-    // ส่วนหลัง dynamic เช่น /member, /team
-    let afterDynamic = dynamicMatch[3] || "";
-    // ให้แน่ใจว่ามี / นำหน้า
-    if (afterDynamic && !afterDynamic.startsWith("/")) afterDynamic = "/" + afterDynamic;
-    // ตัด /dashboard/xxx ออกจาก pathname
-    const afterProject = pathname.replace(/^\/dashboard\/[^/]+/, "");
-    // เทียบเฉพาะส่วนหลัง dynamic
-    return (
-      afterProject === afterDynamic ||
-      afterProject.startsWith(afterDynamic + "/")
-    );
+  {
+    labelgroup: "Management",
+    items: [
+      {
+        label: "Personal Settings",
+        path: pathsConfig.app.workspaceSettingsGeneral,
+        icon: Settings2,
+        role: "owner",
+        submenu: [],
+      }
+    ],
   }
-
-  // Static paths: exact match or nested paths count as active
-  const normalize = (p: string) => p.replace(/\/+$/, "") || "/";
-  const normPathname = normalize(pathname);
-  const normPath = normalize(path);
-  return normPathname === normPath || normPathname.startsWith(`${normPath}/`);
-};
-
+];
 const appRoutesSchema = z.array(approuter);
 appRoutesSchema.parse(APP_ROUTE);
