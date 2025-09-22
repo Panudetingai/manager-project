@@ -32,7 +32,7 @@ const pathsConfig = PathsSchema.parse({
   app: {
     workspaceDashboard: "/dashboard/[workspace]",
     workspaceMembers: "/dashboard/[workspace]/members",
-    workspaceSettingsGeneral: "/dashboard/[workspace]/settings/general",
+    workspaceSettingsGeneral: "/dashboard/[workspace]/settings",
     workspaceBilling: "/dashboard/[workspace]/billing",
     workspaceBillingReturn: "/dashboard/[workspace]/billing/return",
     onboarding: "/onboarding",

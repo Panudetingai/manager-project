@@ -1,4 +1,5 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/animate-ui/components/radix/sidebar";
+import AppHeader from "@/modules/manager/components/app-header";
 import { AppSidebar } from "@/modules/manager/components/app-sidebar";
 
 export default function LayoutDashboardProject({
@@ -9,7 +10,12 @@ export default function LayoutDashboardProject({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="m-6 w-full p-6 rounded-sm">{children}</main>
+      <main className="w-full rounded-sm">
+        <AppHeader />
+        <div className="p-4">
+          {children}
+        </div>
+      </main>
     </SidebarProvider>
   );
 }

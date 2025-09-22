@@ -1,5 +1,6 @@
 "use client";
 
+import { SidebarMenuButton } from "@/components/animate-ui/components/radix/sidebar";
 import {
   Dialog,
   DialogContent,
@@ -16,8 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { getUserClient } from "@/lib/supabase/getUser-client";
 import { useQuery } from "@tanstack/react-query";
 import * as LucideIcons from "lucide-react";
@@ -30,6 +31,7 @@ export function SidebarBanner() {
   const supabase = createClient();
   const { project } = useParams();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const {
     data: user,
@@ -77,7 +79,7 @@ export function SidebarBanner() {
   if (userLoading) {
     return (
       <Skeleton>
-        <SidebarMenuButton className="w-full justify-between">
+        <SidebarMenuButton className="w-full justify-between data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
           <div className="flex items-center space-x-2">
             <div className="h-12 w-8 rounded-full bg-muted" />
           </div>
@@ -92,10 +94,10 @@ export function SidebarBanner() {
   return (
     <Dialog>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild className="py-6">
-          <SidebarMenuButton className="w-full justify-between !h-12">
+        <DropdownMenuTrigger asChild className="flex items-center">
+          <SidebarMenuButton className="w-full justify-between" size="lg">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-foreground rounded-sm">
+              <div className="bg-foreground rounded-sm p-2">
                 <IconComponent className="w-4 h-4 text-muted" />
               </div>
               <div className="flex flex-col">
@@ -108,7 +110,7 @@ export function SidebarBanner() {
             <LucideIcons.ChevronsUpDownIcon />
           </SidebarMenuButton>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-52" side="right">
+        <DropdownMenuContent align="start" className="w-52" side={isMobile ? "bottom" : "right"}>
           <DropdownMenuLabel className="text-xs text-muted-foreground">
             Workspaces
           </DropdownMenuLabel>
