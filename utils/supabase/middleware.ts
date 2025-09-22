@@ -78,6 +78,20 @@ export async function updateSession(request: NextRequest) {
 
   // ตรวจสอบ workspace เฉพาะเมื่อ login แล้ว
 
+  if (
+    user &&
+    onboarded &&
+    onboarded.workspace &&
+    request.nextUrl.pathname === pathsConfig.app.onboarding
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathsConfig.app.workspaceDashboard.replace(
+      "[workspace]",
+      onboarded.workspace // ใช้ workspace จริง
+    );
+    return NextResponse.redirect(url, 302);
+  }
+
   // ถ้า login แล้ว ยังไม่ onboarded และไม่ได้อยู่หน้า onboarding ให้ไป onboarding
   if (
     user &&
@@ -87,15 +101,6 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = pathsConfig.app.onboarding;
     return NextResponse.redirect(url, 302);
-  } else {
-    const url = request.nextUrl.clone();
-    if (url.pathname === pathsConfig.app.onboarding) {
-      url.pathname = pathsConfig.app.workspaceDashboard.replace(
-        "[workspace]",
-        "workspace"
-      );
-      return NextResponse.redirect(url, 302);
-    }
   }
   // ถ้า login แล้ว onboarded แล้ว และไม่ได้อยู่ workspace ให้ไป workspace
 

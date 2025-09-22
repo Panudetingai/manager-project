@@ -98,17 +98,5 @@ export const steps: OnboardStep[] = [
         type: "text",
       },
     ],
-  },
-  {
-    title: "Security",
-    desc: "Secure your account with a password (you can change this later).",
-    field: [
-      {
-        name: "password",
-        label: "Password",
-        placeholder: "Create a strong password",
-        type: "password",
-      },
-    ],
-  },
+  }
 ];

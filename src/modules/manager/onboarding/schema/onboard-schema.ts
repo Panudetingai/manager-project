@@ -19,7 +19,6 @@ export const onboardSchema = z.object({
   primaryUseCase: z
     .string()
     .min(5, "Primary Use Case must be at least 5 characters"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export type descriptiontype = z.infer<typeof onboardSchema>;

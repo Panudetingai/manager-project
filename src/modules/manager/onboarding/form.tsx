@@ -59,7 +59,6 @@ export default function OnboardForm() {
       role: "",
       preferredLanguage: "",
       primaryUseCase: "",
-      password: "",
     },
   });
 
@@ -229,7 +228,7 @@ export default function OnboardForm() {
               <>
                 {isSuccess ? (
                   <div className="flex items-center space-x-2">
-                    <CheckCircle2 className="text-green-500 w-6 h-6 mb-[0.2]" />
+                    <CheckCircle2 className="w-6 h-6 mb-[0.2]" />
                     <span className="">Completed</span>
                   </div>
                 ) : (
@@ -250,7 +249,7 @@ export default function OnboardForm() {
             }}
             key={index}
             className={`h-2 rounded-full transition-all !p-0 duration-300 ${
-              index === currentStep ? "w-8 bg-foreground" : "w-4 bg-gray-300"
+              index === currentStep ? "w-8 bg-primary" : "w-4 bg-gray-300"
             }`}
           ></Button>
         ))}
