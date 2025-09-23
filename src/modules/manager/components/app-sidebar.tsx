@@ -4,13 +4,12 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
+  SidebarMenuSub
 } from "@/components/animate-ui/components/radix/sidebar";
 import {
   Collapsible,
@@ -44,9 +43,8 @@ export function AppSidebar() {
           <div key={item.labelgroup}>
             <SidebarGroup>
               <SidebarGroupLabel>{item.labelgroup}</SidebarGroupLabel>
-              <SidebarGroupContent>
                 <SidebarMenu>
-                  <Collapsible className="group/collapsible w-full">
+                  <Collapsible className="group/collapsible">
                     {item.items.map((i) => (
                       <SidebarMenuItem key={i.path}>
                         {i.submenu && i.submenu.length > 0 ? (
@@ -60,6 +58,7 @@ export function AppSidebar() {
                             >
                               <SidebarMenuButton
                                 className="cursor-pointer"
+                                tooltip={i.label}
                                 isActive={getAppRouteIsActive(pathname, i.path)}
                               >
                                 <i.icon className="h-5 w-5" />
@@ -85,7 +84,7 @@ export function AppSidebar() {
                             </SidebarMenuButton>
                           </Link>
                         )}
-                        <CollapsibleContent className="transition-all duration-300 opacity-0 translate-y-2 data-[state=open]:opacity-100 data-[state=open]:translate-y-0">
+                        <CollapsibleContent>
                           <SidebarMenuSub>
                             {i.submenu && i.submenu.length > 0 && (
                               <>
@@ -119,7 +118,6 @@ export function AppSidebar() {
                     ))}
                   </Collapsible>
                 </SidebarMenu>
-              </SidebarGroupContent>
             </SidebarGroup>
           </div>
         ))}

@@ -13,6 +13,8 @@ const PathsSchema = z.object({
     workspaceDashboard: z.string().min(1),
     workspaceMembers: z.string().min(1),
     workspaceSettingsGeneral: z.string().min(1),
+    workspaceMembersInvitations: z.string().min(1),
+    workspaceMembersGroups: z.string().min(1),
     workspaceBilling: z.string().min(1),
     workspaceBillingReturn: z.string().min(1),
     onboarding: z.string().min(1),
@@ -32,6 +34,8 @@ const pathsConfig = PathsSchema.parse({
   app: {
     workspaceDashboard: "/dashboard/[workspace]",
     workspaceMembers: "/dashboard/[workspace]/members",
+    workspaceMembersInvitations: "/dashboard/[workspace]/members/invitations",
+    workspaceMembersGroups: "/dashboard/[workspace]/members/groups",
     workspaceSettingsGeneral: "/dashboard/[workspace]/settings",
     workspaceBilling: "/dashboard/[workspace]/billing",
     workspaceBillingReturn: "/dashboard/[workspace]/billing/return",
