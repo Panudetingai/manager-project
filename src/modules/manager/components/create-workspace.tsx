@@ -2,20 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -25,8 +25,8 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { iconList } from "../const/icon-list";
 import {
-    FormWorkspaceSchema,
-    FormWorkspaceType,
+  FormWorkspaceSchema,
+  FormWorkspaceType,
 } from "../schema/form-workspace";
 import { createWorkspaceAPI } from "../server/workspace-create";
 
@@ -69,6 +69,7 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
     })
 
     return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form]);
 
   const handlesubmit = form.handleSubmit((data) => {
