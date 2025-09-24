@@ -31,7 +31,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
+      <SidebarHeader className="h-14">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarBanner />

@@ -20,6 +20,9 @@ const PathsSchema = z.object({
     onboarding: z.string().min(1),
     join: z.string().min(1)
   }),
+  join: z.object({
+    menubarjoin: z.string().min(1),
+  })
 });
 
 const pathsConfig = PathsSchema.parse({
@@ -42,6 +45,9 @@ const pathsConfig = PathsSchema.parse({
     onboarding: "/onboarding",
     join: "/join",
   },
+  join: {
+    menubarjoin: "/dashboard/join/[workspace]",
+  }
 } satisfies z.infer<typeof PathsSchema>);
 
 export default pathsConfig;

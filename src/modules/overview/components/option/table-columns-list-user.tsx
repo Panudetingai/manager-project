@@ -1,7 +1,13 @@
 "use client";
 import { Checkbox } from "@/components/animate-ui/primitives/radix/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { Ellipsis } from "lucide-react";
 import { TableformatUser } from "../table-list-user";
@@ -44,6 +50,9 @@ export const TableColumnsListUser: ColumnDef<TableformatUser>[] = [
           <AvatarFallback>user</AvatarFallback>
         </Avatar>
         {row.getValue("username")}
+        {row.original.current === " You" && (
+          <span className="text-xs text-muted-foreground">(You)</span>
+        )}
       </div>
     ),
     enableSorting: true,

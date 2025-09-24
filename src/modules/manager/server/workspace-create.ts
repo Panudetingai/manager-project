@@ -1,6 +1,7 @@
 "use server";
 
 import { getUserServer } from "@/lib/supabase/getUser-server";
+import redis from "@/lib/upstash";
 import { createClient } from "../../../../utils/supabase/server";
 import { FormWorkspaceType } from "../schema/form-workspace";
 
@@ -16,6 +17,11 @@ export async function createWorkspaceAPI(data: FormWorkspaceType) {
   }).select().single();
 
   if (error) throw new Error("Create workspace failed");
+
+  await redis.lpush(`workspaces:${user.id}`, JSON.stringify({
+    name: workspace.name,
+    workspace_icon: workspace.workspace_icon,
+  }));
 
   return workspace;
 }
