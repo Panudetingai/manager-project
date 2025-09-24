@@ -8,6 +8,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import { getUserClient } from "@/lib/supabase/getUser-client";
+import { useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   flexRender,
@@ -25,6 +27,7 @@ import { TableColumnsListUser } from "./option/table-columns-list-user";
 
 type Props = Database["public"]["Tables"]["account"]["Row"][] | undefined;
 export type TableformatUser = {
+  current: string;
   icon: string | null;
   username: string | null;
   email: string | null;
@@ -38,18 +41,23 @@ export default function TableListUser({ userlist }: { userlist: Props }) {
   );
   const [rowSelect, setrowSelect] = useState({});
 
+    const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
+      queryFn: () => getUserClient(),
+    });
+
   const formattedData = useMemo(
     () =>
       (userlist ?? []).map((item) => ({
+        current: item.id === currentUser?.id ? " You" : item.id,
         icon: item.avatar_url,
         username: item.username,
         email: item.email,
       })),
-    [userlist]
+    [userlist, currentUser]
   );
-  console.log(formattedData);
 
-const table = useReactTable({
+  const table = useReactTable({
     data: formattedData,
     columns: TableColumnsListUser,
     onSortingChange: setsorting,

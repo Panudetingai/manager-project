@@ -29,6 +29,7 @@ import { DateRange } from "react-day-picker";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { createClient } from "../../../../utils/supabase/client";
 import { Database } from "../../../../utils/supabase/database.types";
+import LoaderTable from "./option/loader-table";
 import TableListUser from "./table-list-user";
 
 const chartconfig = {
@@ -38,12 +39,12 @@ const chartconfig = {
   },
 } satisfies ChartConfig;
 
-function getDateRange(from: Date, to: Date) {
+function getDaysRange(from: Date, to: Date) {
   const arr = [];
   const start = new Date(from);
   const end = new Date(to);
-  for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-    arr.push(new Date(d).toISOString());
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    arr.push(d.toISOString().slice(0, 10));
   }
   return arr;
 }
@@ -102,14 +103,11 @@ export default function Cardlistuser() {
           userlist: [],
         };
 
-      const daysArr = getLastNDays(
-        range?.to && range.from
-          ? Math.ceil(
-              (range.to.getTime() - range.from.getTime()) /
-                (1000 * 60 * 60 * 24)
-            )
-          : 7
-      );
+      const daysArr =
+        range?.from && range?.to
+          ? getDaysRange(range.from, range.to)
+          : getLastNDays(7);
+
       const result = daysArr.map((date) => ({
         date,
         count: data.filter(
@@ -205,14 +203,18 @@ export default function Cardlistuser() {
         </div>
       </CardHeader>
       <CardContent>
-        <TableListUser userlist={userlist?.userlist} />
+        {isPending ? (
+          <LoaderTable />
+        ) : (
+          <TableListUser userlist={userlist?.userlist.slice(0, 5)} />
+        )}
       </CardContent>
       <CardFooter className="justify-center">
         <Link
           href="#"
           className="text-sm font-medium hover:underline text-primary"
         >
-                View All
+          View All
         </Link>
       </CardFooter>
     </Card>
