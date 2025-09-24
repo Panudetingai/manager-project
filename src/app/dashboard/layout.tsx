@@ -8,14 +8,12 @@ export default function LayoutDashboardProject({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main className="w-full rounded-sm">
-        <AppHeader />
-        <div className="p-4">
-          {children}
-        </div>
-      </main>
-    </SidebarProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="w-full rounded-sm">
+          <AppHeader />
+          <div className="p-4">{children}</div>
+        </main>
+      </SidebarProvider>
   );
 }

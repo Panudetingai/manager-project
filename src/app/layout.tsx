@@ -1,7 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
 import { generateRootMetadata } from "@/lib/meta-data";
-import { default as ClientSSR, default as QueryProvider } from "@/lib/providers/query-provider";
+import QueryProvider from "@/lib/providers/query-provider";
+// @ts-expect-error: CSS import without typings
 import "./globals.css";
+import ClientSSR from "@/lib/providers/clinet-ssr";
 
 export default function RootLayout({
   children,

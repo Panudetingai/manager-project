@@ -1,3 +1,5 @@
+import Cardlistuser from "@/modules/overview/components/card-list-user";
+
 type Params = {
   params: {
     project: Promise<string>;
@@ -6,5 +8,9 @@ type Params = {
 
 export default async function Page({ params }: Params) {
   const { project } = await params;
-  return <div>Page: {project}</div>;
+  return (
+    <div className="flex items-center ">
+      <Cardlistuser />
+    </div>
+  );
 }

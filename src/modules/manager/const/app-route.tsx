@@ -1,4 +1,4 @@
-import { CreditCard, LayoutDashboard, LucideIcon, Settings2, Users2 } from "lucide-react";
+import { CirclePlus, CreditCard, LayoutDashboard, LucideIcon, Settings2, Users2, UsersRound } from "lucide-react";
 import z from "zod";
 import pathsConfig from "../../../../config/app.router";
 
@@ -47,6 +47,16 @@ export const APP_ROUTE: AppRoute[] = [
             path: pathsConfig.app.workspaceMembers,
             icon: Users2,
           },
+          {
+            label: "Invitations",
+            path: pathsConfig.app.workspaceMembersInvitations,
+            icon: CirclePlus,
+          },
+          {
+            label: "Groups",
+            path: pathsConfig.app.workspaceMembersGroups,
+            icon: UsersRound,
+          }
         ],
       },
       {

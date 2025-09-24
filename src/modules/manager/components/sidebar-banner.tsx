@@ -55,6 +55,19 @@ export function SidebarBanner() {
     enabled: !!user?.id,
     staleTime: Infinity,
   });
+
+  const { data: workspaceMember } = useQuery({
+    queryKey: ["workspace_member", project, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("workspace_member")
+        .select("role, workspace:workspace_owner_id(name, workspace_icon)")
+        .eq("user_id_owner_id", user!.id);
+      if (!data) return [];
+      return data;
+    },
+  });
+
   const { data: workspace } = useQuery({
     queryKey: ["workspace", project, user?.id],
     queryFn: async () => {
@@ -70,10 +83,12 @@ export function SidebarBanner() {
     staleTime: Infinity,
   });
 
-  if (!workspace) return null;
+  if (!workspaceMember || !workspaces) return null;
 
-  const iconName = workspace.workspace_icon as keyof typeof LucideIcons;
-  const IconComponent = (LucideIcons[iconName] ??
+  const member = workspaceMember.find((m) => m.workspace.name === project);
+  const iconName = (member?.workspace.workspace_icon ??
+    workspace?.workspace_icon) as keyof typeof LucideIcons;
+  const Icon = (LucideIcons[iconName] ??
     LucideIcons.Folder) as unknown as React.ElementType;
 
   if (userLoading) {
@@ -89,8 +104,6 @@ export function SidebarBanner() {
   }
   if (userError || !user) return null;
 
-  console.log(workspaces)
-
   return (
     <Dialog>
       <DropdownMenu>
@@ -98,19 +111,27 @@ export function SidebarBanner() {
           <SidebarMenuButton className="w-full justify-between" size="lg">
             <div className="flex items-center space-x-2">
               <div className="bg-foreground rounded-sm p-2">
-                <IconComponent className="w-4 h-4 text-muted" />
+                <Icon className="w-4 h-4 text-muted" />
               </div>
               <div className="flex flex-col">
-                <p className="font-medium text-sm">{project}</p>
+                <p className="font-medium text-sm">
+                  {workspaceMember?.find((m) => m.workspace.name === project)
+                    ?.workspace.name ?? project}
+                </p>
                 <span className="text-xs text-muted-foreground">
-                  {user.email}
+                  {workspaceMember?.find((m) => m.workspace.name === project)
+                    ?.role ?? user.email}
                 </span>
               </div>
             </div>
             <LucideIcons.ChevronsUpDownIcon />
           </SidebarMenuButton>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-52" side={isMobile ? "bottom" : "right"}>
+        <DropdownMenuContent
+          align="start"
+          className="w-52"
+          side={isMobile ? "bottom" : "right"}
+        >
           <DropdownMenuLabel className="text-xs text-muted-foreground">
             Workspaces
           </DropdownMenuLabel>
@@ -123,13 +144,44 @@ export function SidebarBanner() {
                 return (
                   <DropdownMenuItem
                     key={workspace.name}
-                    className="w-full"
+                    className={`w-full ${
+                      project === workspace.name ? "font-medium" : ""
+                    }`}
                     onClick={() => {
                       router.push(`/dashboard/${workspace.name}`);
                     }}
                   >
-                    <Icon className="mr-2 h-4 w-4" />
+                    <Icon
+                      className={`mr-2 h-4 w-4 ${
+                        project === workspace.name
+                          ? "text-foreground"
+                          : ""
+                      }`}
+                    />
                     {workspace.name}
+                  </DropdownMenuItem>
+                );
+              })}
+          </DropdownMenuGroup>
+          <DropdownMenuLabel className="text-xs text-muted-foreground">
+            Member
+          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            {workspaceMember &&
+              workspaceMember.map((member) => {
+                const Icon = (LucideIcons[
+                  member.workspace.workspace_icon as keyof typeof LucideIcons
+                ] ?? LucideIcons.Folder) as unknown as React.ElementType;
+                return (
+                  <DropdownMenuItem
+                    key={member.workspace.name}
+                    className="w-full"
+                    onClick={() => {
+                      router.push(`/dashboard/${member.workspace.name}`);
+                    }}
+                  >
+                    <Icon className="mr-2 h-4 w-4" />
+                    {member.workspace.name}
                   </DropdownMenuItem>
                 );
               })}

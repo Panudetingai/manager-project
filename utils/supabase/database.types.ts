@@ -111,6 +111,48 @@ export type Database = {
           },
         ]
       }
+      workspace_member: {
+        Row: {
+          created_at: string
+          invited_by: string | null
+          joined_at: string | null
+          role: Database["public"]["Enums"]["workspace_role"] | null
+          user_id_owner_id: string | null
+          workspace_owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["workspace_role"] | null
+          user_id_owner_id?: string | null
+          workspace_owner_id?: string
+        }
+        Update: {
+          created_at?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["workspace_role"] | null
+          user_id_owner_id?: string | null
+          workspace_owner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_member_user_id_owner_id_fkey"
+            columns: ["user_id_owner_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_member_workspace_owner_id_fkey"
+            columns: ["workspace_owner_id"]
+            isOneToOne: true
+            referencedRelation: "workspace"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -128,6 +170,7 @@ export type Database = {
     }
     Enums: {
       user_roles: "admin" | "user"
+      workspace_role: "member" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -256,6 +299,7 @@ export const Constants = {
   public: {
     Enums: {
       user_roles: ["admin", "user"],
+      workspace_role: ["member", "admin"],
     },
   },
 } as const

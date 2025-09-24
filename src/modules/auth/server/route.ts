@@ -23,7 +23,6 @@ const auth_callback = new Elysia().get(
         email: data.session.user.email,
         username: data.session.user.user_metadata.full_name,
         avatar_url: data.session.user.user_metadata.avatar_url,
-        created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }]);
 

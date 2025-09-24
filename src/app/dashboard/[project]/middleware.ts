@@ -9,27 +9,63 @@ export async function workspaceRedirect(request: NextRequest) {
   const params = pathParts.length > 2 ? { project: pathParts[2] } : {};
   const user = await getUserServer();
 
+  // ดึง workspace ที่ user เป็นเจ้าของ
   const { data: workspaces } = await supabase
     .from("workspace")
-    .select("name")
+    .select("name, id")
     .eq("user_id", user.id);
 
-  const found = workspaces?.find((w) => w.name === params.project);
+  // ดึง workspace ที่ user เป็น member (ถูกเชิญ)
+  const { data: memberWorkspaces, error: memberWorkspaceError } = await supabase
+    .from("workspace_member")
+    .select("role, workspace:workspace_owner_id(name, workspace_icon)")
+    .eq("user_id_owner_id", user.id)
+    .eq("workspace.name", params.project || "");
+
+  if (memberWorkspaceError) {
+    console.error(
+      "Error fetching member workspace details:",
+      memberWorkspaceError
+    );
+  } else {
+    console.log("memberWorkspaceDetails:", memberWorkspaces);
+  }
+  const allWorkspaces = [
+    ...(workspaces ?? []),
+    ...(Array.isArray(memberWorkspaces)
+      ? memberWorkspaces.map((m) => m.workspace).filter(Boolean)
+      : []),
+  ];
+
+  const found = allWorkspaces.find((w) => w.name === params.project);
 
   if (
     found &&
-    request.nextUrl.pathname.startsWith(pathsConfig.app.workspaceDashboard.replace('[workspace]', params.project!))
+    request.nextUrl.pathname.startsWith(
+      pathsConfig.app.workspaceDashboard.replace("[workspace]", params.project!)
+    )
   ) {
     return;
   }
 
-  if (!found && workspaces && workspaces.length > 0) {
+  if (
+    request.nextUrl.pathname.startsWith(
+      pathsConfig.join.menubarjoin.replace("[workspace]", params.project!)
+    )
+  ) {
+    // ...logic เดิม...
+  }
+
+  if (!found && allWorkspaces && allWorkspaces.length > 0) {
     const url = request.nextUrl.clone();
-    url.pathname = pathsConfig.app.workspaceDashboard.replace('[workspace]', workspaces[0].name);
+    url.pathname = pathsConfig.app.workspaceDashboard.replace(
+      "[workspace]",
+      allWorkspaces[0].name
+    );
     return NextResponse.redirect(url, 302);
   }
 
-  if (!found && (!workspaces || workspaces.length === 0)) {
+  if (!found && (!allWorkspaces || allWorkspaces.length === 0)) {
     const url = request.nextUrl.clone();
     url.pathname = pathsConfig.app.onboarding;
     return NextResponse.redirect(url, 302);

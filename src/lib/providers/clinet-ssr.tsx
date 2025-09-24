@@ -7,15 +7,15 @@ interface ClientSSRProps {
 }
 
 export default function ClientSSR({ children }: ClientSSRProps) {
-  const [Mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!Mounted) {
+  if (!mounted) {
     return null;
   }
 
-  return { children };
+  return <>{children}</>;
 }
