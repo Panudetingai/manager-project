@@ -34,7 +34,5 @@ export async function inviteMember({workspace_owner_id, user_owner_id}: InviteMe
 
   if (error) return { error };
 
-  console.log(user);
-
   return "success invite member";
 }

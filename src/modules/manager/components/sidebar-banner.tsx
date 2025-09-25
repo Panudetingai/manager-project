@@ -23,6 +23,7 @@ import { getUserClient } from "@/lib/supabase/getUser-client";
 import { useQuery } from "@tanstack/react-query";
 import * as LucideIcons from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { elysia } from "../../../../config/eylsia.config";
 import { createClient } from "../../../../utils/supabase/client";
 import { useWorkspaceState } from "../store/workspace-state";
@@ -33,7 +34,7 @@ export function SidebarBanner() {
   const { project } = useParams();
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { setWorkspaceId, setWorkspaceName } = useWorkspaceState();
+  const { setWorkspaceId } = useWorkspaceState();
 
   const {
     data: user,
@@ -81,12 +82,15 @@ export function SidebarBanner() {
         .single();
 
       if (!data) return null;
-      setWorkspaceId(data.id);
       return data;
     },
     enabled: !!user?.id && !!project,
     staleTime: Infinity,
   });
+
+  useEffect(() => {
+    if (workspace?.id) setWorkspaceId(workspace.id);
+  }, [project, workspace?.id, setWorkspaceId]);
 
   if (!workspaceMember || !workspaces) return null;
 
@@ -153,8 +157,6 @@ export function SidebarBanner() {
                       project === workspace.name ? "font-medium" : ""
                     }`}
                    onClick={() => {
-                    setWorkspaceId(workspace.id);
-                    setWorkspaceName(workspace.name);
                     router.push(`/dashboard/${workspace.name}`);
                    }}
                   >

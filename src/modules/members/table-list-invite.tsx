@@ -23,6 +23,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { PlusCircle } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "../../../utils/supabase/client";
 import { useWorkspaceState } from "../manager/store/workspace-state";
@@ -40,9 +41,10 @@ export default function TableListInvite() {
   const [isopen, setisopen] = useState(false);
   const { data: user } = useUserClient();
   const {workspaceId} = useWorkspaceState();
+  const {project} = useParams();
 
   const { data: members } = useQuery({
-    queryKey: ["getmembers", user?.id, workspaceId],
+    queryKey: ["getmembers", user?.id, workspaceId, project],
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace_invite")
