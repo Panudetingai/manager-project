@@ -6,7 +6,7 @@ import { createClient } from "../../../../../utils/supabase/server";
 
 type workspacesType = Pick<
   Database["public"]["Tables"]["workspace"]["Row"],
-  "name" | "workspace_icon"
+  "name" | "workspace_icon" | "id"
 >;
 
 const workspace = new Elysia().get("/workspaces", async () => {
@@ -19,7 +19,7 @@ const workspace = new Elysia().get("/workspaces", async () => {
 
   const { data: workspaces, error } = await supabase
     .from("workspace")
-    .select("name, workspace_icon")
+    .select("name, workspace_icon, id")
     .eq("user_id", user.id);
 
   if (error) throw new Error("Fetch workspaces failed");

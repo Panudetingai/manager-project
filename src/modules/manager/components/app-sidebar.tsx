@@ -50,10 +50,12 @@ export function AppSidebar() {
                         {i.submenu && i.submenu.length > 0 ? (
                           <CollapsibleTrigger className="w-full" asChild>
                             <Link
-                              href={i.path.replace(
-                                "[workspace]",
-                                workspaceName.toString()
-                              )}
+                              href={{
+                                pathname: i.path.replace(
+                                  "[workspace]",
+                                  workspaceName.toString()
+                                ),
+                              }}
                               passHref
                             >
                               <SidebarMenuButton
@@ -69,10 +71,12 @@ export function AppSidebar() {
                           </CollapsibleTrigger>
                         ) : (
                           <Link
-                            href={i.path.replace(
-                              "[workspace]",
-                              workspaceName.toString()
-                            )}
+                            href={{
+                              pathname: i.path.replace(
+                                "[workspace]",
+                                workspaceName.toString()
+                              ),
+                            }}
                             passHref
                           >
                             <SidebarMenuButton
@@ -91,10 +95,12 @@ export function AppSidebar() {
                                 {i.submenu.map((sub) => (
                                   <SidebarMenuItem key={sub.path}>
                                     <Link
-                                      href={sub.path.replace(
-                                        "[workspace]",
-                                        workspaceName.toString()
-                                      )}
+                                      href={{
+                                        pathname: sub.path.replace(
+                                          "[workspace]",
+                                          workspaceName.toString()
+                                        ),
+                                      }}
                                       passHref
                                     >
                                       <SidebarMenuButton

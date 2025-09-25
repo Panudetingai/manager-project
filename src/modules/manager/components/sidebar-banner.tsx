@@ -25,6 +25,7 @@ import * as LucideIcons from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { elysia } from "../../../../config/eylsia.config";
 import { createClient } from "../../../../utils/supabase/client";
+import { useWorkspaceState } from "../store/workspace-state";
 import CreateWorkspaceForm from "./create-workspace";
 
 export function SidebarBanner() {
@@ -32,6 +33,7 @@ export function SidebarBanner() {
   const { project } = useParams();
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { setWorkspaceId, setWorkspaceName } = useWorkspaceState();
 
   const {
     data: user,
@@ -61,7 +63,7 @@ export function SidebarBanner() {
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace_member")
-        .select("role, workspace:workspace_owner_id(name, workspace_icon)")
+        .select("role, workspace:workspace_owner_id(id, name, workspace_icon)")
         .eq("user_id_owner_id", user!.id);
       if (!data) return [];
       return data;
@@ -73,10 +75,13 @@ export function SidebarBanner() {
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace")
-        .select("name, workspace_icon")
+        .select("id,name, workspace_icon")
         .eq("user_id", user!.id)
         .eq("name", project as string)
         .single();
+
+      if (!data) return null;
+      setWorkspaceId(data.id);
       return data;
     },
     enabled: !!user?.id && !!project,
@@ -147,9 +152,11 @@ export function SidebarBanner() {
                     className={`w-full ${
                       project === workspace.name ? "font-medium" : ""
                     }`}
-                    onClick={() => {
-                      router.push(`/dashboard/${workspace.name}`);
-                    }}
+                   onClick={() => {
+                    setWorkspaceId(workspace.id);
+                    setWorkspaceName(workspace.name);
+                    router.push(`/dashboard/${workspace.name}`);
+                   }}
                   >
                     <Icon
                       className={`mr-2 h-4 w-4 ${

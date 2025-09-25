@@ -111,6 +111,57 @@ export type Database = {
           },
         ]
       }
+      workspace_invite: {
+        Row: {
+          created_at: string
+          expired_at: string
+          invited_by: string
+          updated_at: string | null
+          user_owner_id: string
+          workspace_owner_id: string
+          workspace_status:
+            | Database["public"]["Enums"]["workspace_status"]
+            | null
+        }
+        Insert: {
+          created_at?: string
+          expired_at?: string
+          invited_by?: string
+          updated_at?: string | null
+          user_owner_id?: string
+          workspace_owner_id?: string
+          workspace_status?:
+            | Database["public"]["Enums"]["workspace_status"]
+            | null
+        }
+        Update: {
+          created_at?: string
+          expired_at?: string
+          invited_by?: string
+          updated_at?: string | null
+          user_owner_id?: string
+          workspace_owner_id?: string
+          workspace_status?:
+            | Database["public"]["Enums"]["workspace_status"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_invite_user_owner_id_fkey"
+            columns: ["user_owner_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_invite_workspace_owner_id_fkey"
+            columns: ["workspace_owner_id"]
+            isOneToOne: true
+            referencedRelation: "workspace"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_member: {
         Row: {
           created_at: string
@@ -126,7 +177,7 @@ export type Database = {
           joined_at?: string | null
           role?: Database["public"]["Enums"]["workspace_role"] | null
           user_id_owner_id?: string | null
-          workspace_owner_id?: string
+          workspace_owner_id: string
         }
         Update: {
           created_at?: string
@@ -137,6 +188,13 @@ export type Database = {
           workspace_owner_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_member_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_member_user_id_owner_id_fkey"
             columns: ["user_id_owner_id"]
@@ -171,6 +229,7 @@ export type Database = {
     Enums: {
       user_roles: "admin" | "user"
       workspace_role: "member" | "admin"
+      workspace_status: "pending" | "cancel" | "reject" | "answer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -300,6 +359,7 @@ export const Constants = {
     Enums: {
       user_roles: ["admin", "user"],
       workspace_role: ["member", "admin"],
+      workspace_status: ["pending", "cancel", "reject", "answer"],
     },
   },
 } as const

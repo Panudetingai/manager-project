@@ -16,20 +16,12 @@ export async function workspaceRedirect(request: NextRequest) {
     .eq("user_id", user.id);
 
   // ดึง workspace ที่ user เป็น member (ถูกเชิญ)
-  const { data: memberWorkspaces, error: memberWorkspaceError } = await supabase
+  const { data: memberWorkspaces } = await supabase
     .from("workspace_member")
     .select("role, workspace:workspace_owner_id(name, workspace_icon)")
     .eq("user_id_owner_id", user.id)
     .eq("workspace.name", params.project || "");
 
-  if (memberWorkspaceError) {
-    console.error(
-      "Error fetching member workspace details:",
-      memberWorkspaceError
-    );
-  } else {
-    console.log("memberWorkspaceDetails:", memberWorkspaces);
-  }
   const allWorkspaces = [
     ...(workspaces ?? []),
     ...(Array.isArray(memberWorkspaces)
@@ -48,15 +40,8 @@ export async function workspaceRedirect(request: NextRequest) {
     return;
   }
 
-  if (
-    request.nextUrl.pathname.startsWith(
-      pathsConfig.join.menubarjoin.replace("[workspace]", params.project!)
-    )
-  ) {
-    // ...logic เดิม...
-  }
-
   if (!found && allWorkspaces && allWorkspaces.length > 0) {
+
     const url = request.nextUrl.clone();
     url.pathname = pathsConfig.app.workspaceDashboard.replace(
       "[workspace]",
