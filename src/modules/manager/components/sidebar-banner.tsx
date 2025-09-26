@@ -49,7 +49,7 @@ export function SidebarBanner() {
   });
 
   const { data: workspaces } = useQuery({
-    queryKey: ["workspace", user?.id],
+    queryKey: ["workspaces", user?.id],
     queryFn: async () => {
       const res = await elysia.api.workspaces.get();
       const data = res.data;
@@ -60,7 +60,7 @@ export function SidebarBanner() {
   });
 
   const { data: workspaceMember } = useQuery({
-    queryKey: ["workspace_member", project, user?.id],
+    queryKey: ["workspaces", project, user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace_member")
@@ -72,7 +72,7 @@ export function SidebarBanner() {
   });
 
   const { data: workspace } = useQuery({
-    queryKey: ["workspace", project, user?.id],
+    queryKey: ["workspaces-single", project, user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace")

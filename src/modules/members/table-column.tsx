@@ -9,12 +9,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import { ChevronsUpDown, EllipsisIcon } from "lucide-react";
+import {
+  ChevronsUpDown,
+  EllipsisIcon,
+  ShieldAlert,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import { Database } from "../../../utils/supabase/database.types";
-import { cancelInvite } from "./server/action/invite";
+import {
+  cancelInvite,
+  updateRoleMember,
+} from "./server/action/workspace-member";
 
 export type tableColumnType = {
   id: string;
+  user_owner_id: string;
   email: string;
   username: string | null;
   avatar: string | null;
@@ -28,23 +38,63 @@ export const ActionCell = ({ row }: { row: tableColumnType }) => {
 
   const handleCancelInvite = () => {
     cancelInvite(row.id).then(() => {
-    queryClient.invalidateQueries({ queryKey: ["getmembers"] });
-  });
-  }
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+    });
+  };
+
+  const handleupdateRole = ({
+    role,
+  }: {
+    role: Database["public"]["Enums"]["workspace_role"];
+  }) => {
+    // Update the role in the database
+    updateRoleMember({
+      role,
+      user_owner_id: row.user_owner_id,
+      memberId: row.id,
+    }).then(() => {
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+    });
+  };
 
   return (
-    <DropdownMenuItem
-      onClick={handleCancelInvite}
-      className="cursor-pointer bg-destructive/20 text-destructive hover:!text-destructive hover:!bg-destructive/30"
-    >
-      Cancel Invite
-    </DropdownMenuItem>
+    <>
+      {row.status === "pending" ? (
+        <DropdownMenuItem
+          onClick={handleCancelInvite}
+          className="cursor-pointer"
+        >
+          Cancel Invitation
+        </DropdownMenuItem>
+      ) : (
+        <>
+          <DropdownMenuItem
+            onClick={() => handleupdateRole({ role: "member" })}
+            className="cursor-pointer"
+          >
+            <ShieldCheck />
+            Member
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleupdateRole({ role: "admin" })}
+            className="cursor-pointer"
+          >
+            <ShieldAlert />
+            Admin
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
+            <Trash2 />
+            Remove Member
+          </DropdownMenuItem>
+        </>
+      )}
+    </>
   );
 };
 
 export const TableColumnsListInvite: ColumnDef<tableColumnType>[] = [
   {
-    accessorKey: "email",
+    accessorKey: "username",
     header: ({ column }) => (
       <Button
         size={"sm"}
@@ -62,16 +112,16 @@ export const TableColumnsListInvite: ColumnDef<tableColumnType>[] = [
             src={row.original.avatar || ""}
             alt={row.getValue("username")}
           />
-          <AvatarFallback>user</AvatarFallback>
+          <AvatarFallback>{row.original.username?.slice(0, 1)}</AvatarFallback>
         </Avatar>
-        {row.getValue("email")}
+        {row.getValue("username")}
       </div>
     ),
   },
   {
-    accessorKey: "username",
-    header: "Username",
-    cell: ({ row }) => <div>{row.getValue("username") || "No username"}</div>,
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => <div>{row.getValue("email") || "No email"}</div>,
   },
   {
     accessorKey: "workspace",

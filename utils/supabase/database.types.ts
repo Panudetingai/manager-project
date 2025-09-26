@@ -147,6 +147,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "workspace_invite_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "workspace_invite_user_owner_id_fkey"
             columns: ["user_owner_id"]
             isOneToOne: false
@@ -216,12 +223,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_workspace: {
+        Args: { c_user_owner_id: string; c_workspace_owner_id: string }
+        Returns: undefined
+      }
       create_onboarding_and_workspace: {
         Args: {
           p_description: Json
           p_user_id: string
           p_user_type: string
           p_workspace_name: string
+        }
+        Returns: undefined
+      }
+      workspace_approved: {
+        Args: {
+          w_invited_by: string
+          w_joined: string
+          w_role: Database["public"]["Enums"]["workspace_role"]
+          w_user_owner_id: string
+          w_workspace_owner_id: string
+          w_workspace_status: Database["public"]["Enums"]["workspace_status"]
         }
         Returns: undefined
       }

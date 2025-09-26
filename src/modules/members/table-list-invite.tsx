@@ -44,21 +44,22 @@ export default function TableListInvite() {
   const {project} = useParams();
 
   const { data: members } = useQuery({
-    queryKey: ["getmembers", user?.id, workspaceId, project],
+    queryKey: ["workspaces", user?.id, workspaceId, project],
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace_invite")
         .select(
-          "workspace_owner_id, workspace_status, created_at, account:user_owner_id(email, username, avatar_url), workspace:workspace_owner_id(name)"
+          "workspace_owner_id, workspace_status, created_at, account!user_owner_id(id, email, username, avatar_url), workspace:workspace_owner_id(name)"
         )
         .eq("workspace_owner_id", workspaceId || "")
         .eq("invited_by", user?.id || "")
-        .eq("workspace_status", "pending");
+        .in("workspace_status", ["pending", "answer"]);
 
       if (!data) return [];
 
       const formatdata: tableColumnType[] = data.map((member) => ({
         id: member.workspace_owner_id,
+        user_owner_id: member.account.id,
         email: member.account.email,
         username: member.account.username,
         avatar: member.account.avatar_url,

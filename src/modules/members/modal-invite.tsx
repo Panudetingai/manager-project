@@ -14,10 +14,12 @@ import { useUserClient } from "@/lib/supabase/getUser-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, UserPlusIcon } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { createClient } from "../../../utils/supabase/client";
 import { useWorkspaceState } from "../manager/store/workspace-state";
-import { inviteMember, InviteMemberparams } from "./server/action/invite";
+import {
+  inviteMember,
+  InviteMemberparams,
+} from "./server/action/workspace-member";
 
 type Props = {
   isopen: boolean;
@@ -37,45 +39,26 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
       const { data } = await supabase
         .from("account")
         .select("id, email, username, avatar_url")
-        .ilike("email", `%${searchTerm}%`)
-        .or(`username.ilike.%${searchTerm}%`)
+        .or(`email.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`)
         .not("id", "eq", user?.id || "")
         .limit(5);
 
       return data;
     },
-    staleTime: 2000,
+    staleTime: 1000,
   });
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({
-      workspace_owner_id,
-      user_owner_id,
+      workspace_owner_id: workspaceId,
+      user_owner_id: userId,
     }: InviteMemberparams) => {
-      return await inviteMember({ workspace_owner_id, user_owner_id });
-    },
+      return await inviteMember({ workspace_owner_id: workspaceId, user_owner_id: userId });
+    }, onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+      setisopen(false);
+    }
   });
-
-  const handleInvite = (id: string) => {
-    if (!workspaceId) return;
-    mutate(
-      {
-        workspace_owner_id: workspaceId,
-        user_owner_id: id,
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["getmembers"] });
-          toast.success("Member invited successfully");
-          setisopen(false);
-        },
-        onError: (error) => {
-          console.error(error);
-          toast.error("Failed to invite member");
-        },
-      }
-    );
-  };
 
   return (
     <Dialog open={isopen} onOpenChange={() => setisopen(!isopen)}>
@@ -103,7 +86,7 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
                         src={user.avatar_url || ""}
                         alt={user.username || "user"}
                       />
-                      <AvatarFallback>user</AvatarFallback>
+                      <AvatarFallback>{user.username?.slice(0, 1)}</AvatarFallback>
                     </Avatar>
                     <div className="text-muted-foreground text-sm">
                       {user.username}
@@ -113,7 +96,10 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
                     className="rounded-sm cursor-pointer"
                     disabled={isPending}
                     size={"sm"}
-                    onClick={() => handleInvite(user.id)}
+                    onClick={() => mutate({
+                      workspace_owner_id: workspaceId || "",
+                      user_owner_id: user.id,
+                    })}
                   >
                     {isPending ? (
                       <>

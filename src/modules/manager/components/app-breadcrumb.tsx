@@ -5,19 +5,19 @@ import { usePathname } from "next/navigation";
 import * as React from "react";
 
 import {
-    Breadcrumb,
-    BreadcrumbEllipsis,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 function formatSegment(segment: string) {
@@ -54,7 +54,7 @@ export function AppBreadcrumb() {
           <>
             {/* Home */}
             <BreadcrumbItem>
-              <Link href={items[0].href} passHref legacyBehavior>
+              <Link href={{pathname: items[0].href}} passHref legacyBehavior>
                 <BreadcrumbLink asChild>
                   <a>{items[0].label}</a>
                 </BreadcrumbLink>
@@ -63,7 +63,7 @@ export function AppBreadcrumb() {
             <BreadcrumbSeparator />
             {/* First real segment */}
             <BreadcrumbItem>
-              <Link href={items[1].href} passHref legacyBehavior>
+              <Link href={{pathname: items[1].href}} passHref legacyBehavior>
                 <BreadcrumbLink asChild>
                   <a>{items[1].label}</a>
                 </BreadcrumbLink>
@@ -85,7 +85,7 @@ export function AppBreadcrumb() {
                 <DropdownMenuContent align="start">
                   {items.slice(2, items.length - 1).map((it) => (
                     <div key={it.href} className="px-2 py-1">
-                      <Link href={it.href} passHref legacyBehavior>
+                      <Link href={{pathname: it.href}} passHref legacyBehavior>
                         <a className="block w-full text-sm">{it.label}</a>
                       </Link>
                     </div>

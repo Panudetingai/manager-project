@@ -1,13 +1,6 @@
 import Cardlistuser from "@/modules/overview/components/card-list-user";
 
-type Params = {
-  params: {
-    project: Promise<string>;
-  };
-};
-
-export default async function Page({ params }: Params) {
-  const { project } = await params;
+export default async function Page() {
   return (
     <div className="flex items-center ">
       <Cardlistuser />
