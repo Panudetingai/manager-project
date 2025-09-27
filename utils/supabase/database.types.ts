@@ -249,7 +249,7 @@ export type Database = {
       }
     }
     Enums: {
-      user_roles: "admin" | "user"
+      user_roles: "admin" | "user" | "guest" | "owner"
       workspace_role: "member" | "admin"
       workspace_status: "pending" | "cancel" | "reject" | "answer"
     }
@@ -379,7 +379,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      user_roles: ["admin", "user"],
+      user_roles: ["admin", "user", "guest", "owner"],
       workspace_role: ["member", "admin"],
       workspace_status: ["pending", "cancel", "reject", "answer"],
     },
