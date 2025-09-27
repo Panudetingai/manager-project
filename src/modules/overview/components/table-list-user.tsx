@@ -56,8 +56,7 @@ export default function TableListUser({ userlist }: { userlist: Props }) {
       })),
     [userlist, currentUser]
   );
-
-  const table = useReactTable({
+const table = useReactTable({
     data: formattedData,
     columns: TableColumnsListUser,
     onSortingChange: setsorting,

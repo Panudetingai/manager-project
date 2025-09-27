@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import redis from "@/lib/upstash";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
@@ -50,7 +51,8 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createWorkspaceAPI,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      console.log(data);
       router.push(data.name);
     },
     onError: (error) => {
@@ -67,7 +69,6 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
             form.clearErrors("workspacename");
         }
     })
-
     return () => subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form]);

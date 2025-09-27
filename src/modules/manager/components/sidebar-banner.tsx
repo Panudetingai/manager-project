@@ -23,8 +23,10 @@ import { getUserClient } from "@/lib/supabase/getUser-client";
 import { useQuery } from "@tanstack/react-query";
 import * as LucideIcons from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { elysia } from "../../../../config/eylsia.config";
 import { createClient } from "../../../../utils/supabase/client";
+import { useWorkspaceState } from "../store/workspace-state";
 import CreateWorkspaceForm from "./create-workspace";
 
 export function SidebarBanner() {
@@ -32,6 +34,7 @@ export function SidebarBanner() {
   const { project } = useParams();
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { setWorkspaceId } = useWorkspaceState();
 
   const {
     data: user,
@@ -46,7 +49,7 @@ export function SidebarBanner() {
   });
 
   const { data: workspaces } = useQuery({
-    queryKey: ["workspace", user?.id],
+    queryKey: ["workspaces", user?.id],
     queryFn: async () => {
       const res = await elysia.api.workspaces.get();
       const data = res.data;
@@ -57,11 +60,11 @@ export function SidebarBanner() {
   });
 
   const { data: workspaceMember } = useQuery({
-    queryKey: ["workspace_member", project, user?.id],
+    queryKey: ["workspaces", project, user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace_member")
-        .select("role, workspace:workspace_owner_id(name, workspace_icon)")
+        .select("role, workspace:workspace_owner_id(id, name, workspace_icon)")
         .eq("user_id_owner_id", user!.id);
       if (!data) return [];
       return data;
@@ -69,19 +72,25 @@ export function SidebarBanner() {
   });
 
   const { data: workspace } = useQuery({
-    queryKey: ["workspace", project, user?.id],
+    queryKey: ["workspaces-single", project, user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("workspace")
-        .select("name, workspace_icon")
+        .select("id,name, workspace_icon")
         .eq("user_id", user!.id)
         .eq("name", project as string)
         .single();
+
+      if (!data) return null;
       return data;
     },
     enabled: !!user?.id && !!project,
     staleTime: Infinity,
   });
+
+  useEffect(() => {
+    if (workspace?.id) setWorkspaceId(workspace.id);
+  }, [project, workspace?.id, setWorkspaceId]);
 
   if (!workspaceMember || !workspaces) return null;
 
@@ -147,9 +156,9 @@ export function SidebarBanner() {
                     className={`w-full ${
                       project === workspace.name ? "font-medium" : ""
                     }`}
-                    onClick={() => {
-                      router.push(`/dashboard/${workspace.name}`);
-                    }}
+                   onClick={() => {
+                    router.push(`/dashboard/${workspace.name}`);
+                   }}
                   >
                     <Icon
                       className={`mr-2 h-4 w-4 ${
