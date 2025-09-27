@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ChevronsUpDown,
@@ -17,7 +17,9 @@ import {
   Trash2,
 } from "lucide-react";
 import { Database } from "../../../utils/supabase/database.types";
+import { tableInvitationType } from "./invitations/table-list-invitations";
 import {
+  cancelInvitation,
   cancelInvite,
   updateRoleMember,
 } from "./server/action/workspace-member";
@@ -57,6 +59,17 @@ export const ActionCell = ({ row }: { row: tableColumnType }) => {
     });
   };
 
+  const { mutate: removeInvite } = useMutation({
+    mutationFn: async () => {
+      await cancelInvitation({
+        value: {
+          workspace_owner_id: row.id,
+          user_owner_id: row.user_owner_id,
+        } as tableInvitationType,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+    },
+  });
   return (
     <>
       {row.status === "pending" ? (
@@ -82,7 +95,10 @@ export const ActionCell = ({ row }: { row: tableColumnType }) => {
             <ShieldAlert />
             Admin
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => removeInvite()}
+          >
             <Trash2 />
             Remove Member
           </DropdownMenuItem>
