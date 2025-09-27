@@ -10,3 +10,13 @@ export async function getUserServer() {
     }
     return data.user;
 }
+
+export async function getUserRoleServer() {
+    const supabase = await createClient();
+    const user = await getUserServer();
+    const {data, error} = await supabase.from('account').select('role').eq('id', user.id).single();
+    if (error) {
+        throw new Error(error.message);
+    }
+    return data.role;
+}
