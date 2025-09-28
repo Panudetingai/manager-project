@@ -45,7 +45,6 @@ export async function updateSession(request: NextRequest) {
       pathsConfig.app.workspaceDashboard.replace("[workspace]", "")
     ) ||
       request.nextUrl.pathname.startsWith(pathsConfig.app.onboarding))
-      || request.nextUrl.pathname === "/dashboard"
   ) {
     const url = request.nextUrl.clone();
     url.pathname = pathsConfig.auth.signIn;
@@ -97,7 +96,7 @@ export async function updateSession(request: NextRequest) {
   if (
     user &&
     (!onboarded || !onboarded.workspace) &&
-    request.nextUrl.pathname !== pathsConfig.app.onboarding
+    !request.nextUrl.pathname.startsWith(pathsConfig.app.onboarding)
   ) {
     const url = request.nextUrl.clone();
     url.pathname = pathsConfig.app.onboarding;
@@ -109,9 +108,7 @@ export async function updateSession(request: NextRequest) {
     user &&
     onboarded &&
     onboarded.workspace &&
-    request.nextUrl.pathname.startsWith(
-      pathsConfig.app.workspaceDashboard.replace("[workspace]", "")
-    )
+    request.nextUrl.pathname.startsWith(pathsConfig.app.onboarding)
   ) {
     const result = await workspaceRedirect(request);
     if (result) return result;
