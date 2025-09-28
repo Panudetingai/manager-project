@@ -82,6 +82,18 @@ export const APP_ROUTE: AppRoute[] = [
     ],
   },
   {
+    labelgroup: "Create New",
+    role: ["owner"],
+    items: [
+      {
+        label: "New Project",
+        path: "dashboard",
+        icon: LayoutDashboard,
+        role: ["owner"],
+      }
+    ]
+  },
+  {
     labelgroup: "Management",
     role: ["owner", "admin"],
     items: [
