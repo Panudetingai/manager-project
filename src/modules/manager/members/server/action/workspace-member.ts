@@ -28,6 +28,8 @@ export async function inviteMember({
   const supabase = await createClient();
   const user = await getUserServer();
 
+  if (!user) return { error: "User not found" };
+
   const { error } = await supabase.from("workspace_invite").insert({
     workspace_owner_id,
     user_owner_id,

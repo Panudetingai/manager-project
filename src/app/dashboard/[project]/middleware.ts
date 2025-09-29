@@ -22,6 +22,8 @@ export async function workspaceRedirect(request: NextRequest) {
   const params = pathParts.length > 2 ? { project: pathParts[2] } : {};
   const user = await getUserServer();
 
+  if (!user) return;
+
   // redis cache worksapce list per user could be implemented here for optimization
   const cacheKey = `workspaces:${user.id}`;
   let allWorkspaces = await redis.get(cacheKey) as Workspace[] | null;

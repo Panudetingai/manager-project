@@ -13,7 +13,7 @@ export default async function LayoutDashboardProject({
 
   return (
       <SidebarProvider>
-        <AppSidebar role={userRole} />
+        <AppSidebar role={userRole || "guest"} />
         <main className="w-full rounded-sm">
           <AppHeader />
           <div className="p-4">{children}</div>
