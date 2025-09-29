@@ -1,4 +1,5 @@
-import TableListInvite from "@/modules/members/table-list-invite";
+import TableListInvite from "@/modules/manager/members/table-list-invite";
+
 
 export default function page() {
   return (

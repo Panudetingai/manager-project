@@ -2,17 +2,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { Ellipsis, Shield, Trash, User } from "lucide-react";
-import { Database } from "../../../../utils/supabase/database.types";
+import { Database } from "../../../../../utils/supabase/database.types";
 import { tableInvitationType } from "../invitations/table-list-invitations";
 import { cancelInvitation, updateRoleMember } from "../server/action/workspace-member";
 import { TableListGroupsType } from "./table-list-groups";

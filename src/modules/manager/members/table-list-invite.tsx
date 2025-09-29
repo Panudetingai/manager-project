@@ -25,8 +25,8 @@ import {
 import { PlusCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "../../../utils/supabase/client";
-import { useWorkspaceState } from "../manager/store/workspace-state";
+import { createClient } from "../../../../utils/supabase/client";
+import { useWorkspaceState } from "../store/workspace-state";
 import ModalInvite from "./modal-invite";
 import { TableColumnsListInvite, tableColumnType } from "./table-column";
 

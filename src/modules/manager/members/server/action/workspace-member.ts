@@ -1,7 +1,7 @@
 "use server";
 import { getUserServer } from "@/lib/supabase/getUser-server";
-import { Database } from "../../../../../utils/supabase/database.types";
-import { createClient } from "../../../../../utils/supabase/server";
+import { Database } from "../../../../../../utils/supabase/database.types";
+import { createClient } from "../../../../../../utils/supabase/server";
 import { tableInvitationType } from "../../invitations/table-list-invitations";
 
 export async function cancelInvite(id: string) {

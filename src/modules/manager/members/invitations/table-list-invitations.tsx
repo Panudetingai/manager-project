@@ -18,7 +18,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { useState } from "react";
-import { createClient } from "../../../../utils/supabase/client";
+import { createClient } from "../../../../../utils/supabase/client";
 import { TableColumnsListInvitaion } from "./table-colunm";
 
 export type tableInvitationType = {

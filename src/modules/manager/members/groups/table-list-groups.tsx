@@ -9,8 +9,8 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { createClient } from "../../../../utils/supabase/client";
-import { Database } from "../../../../utils/supabase/database.types";
+import { createClient } from "../../../../../utils/supabase/client";
+import { Database } from "../../../../../utils/supabase/database.types";
 import { TableListGroupsColumnGroup } from "./table-colunm-group";
 
 export type TableListGroupsType = {

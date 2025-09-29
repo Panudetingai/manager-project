@@ -1,4 +1,4 @@
-import TableListGroups from "@/modules/members/groups/table-list-groups";
+import TableListGroups from "@/modules/manager/members/groups/table-list-groups";
 
 export default function page() {
   return (

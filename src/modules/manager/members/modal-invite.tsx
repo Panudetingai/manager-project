@@ -14,12 +14,12 @@ import { useUserClient } from "@/lib/supabase/getUser-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, UserPlusIcon } from "lucide-react";
 import { useState } from "react";
-import { createClient } from "../../../utils/supabase/client";
-import { useWorkspaceState } from "../manager/store/workspace-state";
 import {
   inviteMember,
   InviteMemberparams,
 } from "./server/action/workspace-member";
+import { createClient } from "../../../../utils/supabase/client";
+import { useWorkspaceState } from "../store/workspace-state";
 
 type Props = {
   isopen: boolean;

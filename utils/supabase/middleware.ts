@@ -76,8 +76,13 @@ export async function updateSession(request: NextRequest) {
     onboarded = data;
   }
 
-  // ตรวจสอบ workspace เฉพาะเมื่อ login แล้ว
+  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathsConfig.auth.signIn;
+    return NextResponse.redirect(url, 302);
+  }
 
+  // ตรวจสอบ workspace เฉพาะเมื่อ login แล้ว
   if (
     user &&
     onboarded &&
@@ -104,15 +109,17 @@ export async function updateSession(request: NextRequest) {
   }
   // ถ้า login แล้ว onboarded แล้ว และไม่ได้อยู่ workspace ให้ไป workspace
 
-  if (
-    user &&
-    onboarded &&
-    onboarded.workspace &&
-    request.nextUrl.pathname.startsWith(pathsConfig.app.onboarding)
-  ) {
-    const result = await workspaceRedirect(request);
-    if (result) return result;
-  }
+if (
+  user &&
+  onboarded &&
+  onboarded.workspace &&
+  request.nextUrl.pathname.startsWith(
+    pathsConfig.app.workspaceDashboard.replace("[workspace]", "")
+  )
+) {
+  const result = await workspaceRedirect(request);
+  if (result) return result;
+}
 
   // ไม่ต้อง redirect
   return supabaseResponse;

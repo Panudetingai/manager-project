@@ -16,7 +16,7 @@ import {
   ShieldCheck,
   Trash2,
 } from "lucide-react";
-import { Database } from "../../../utils/supabase/database.types";
+import { Database } from "../../../../utils/supabase/database.types";
 import { tableInvitationType } from "./invitations/table-list-invitations";
 import {
   cancelInvitation,
