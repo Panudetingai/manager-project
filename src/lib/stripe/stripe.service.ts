@@ -91,7 +91,17 @@ class StripeService {
     );
     return session;
   }
+  /**
+   * 
+   * @returns 
+   */
+  
+  public async getProduct(productId: string) {
+    const product = await StripeService.stripe.products.retrieve(productId);
+    return product;
+  }
 }
+
 
 export const CreateServiceStripe = () => {
   return new StripeService();
