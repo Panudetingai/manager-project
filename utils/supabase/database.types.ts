@@ -79,6 +79,90 @@ export type Database = {
           },
         ]
       }
+      subscription: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          itemlines_id: string | null
+          subscription_customer_id: string | null
+          subscription_id: string
+          subscription_invoice_id: string
+          subscription_status: string | null
+          updated_at: string | null
+          user_owner_subscription_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id: string
+          itemlines_id?: string | null
+          subscription_customer_id?: string | null
+          subscription_id: string
+          subscription_invoice_id: string
+          subscription_status?: string | null
+          updated_at?: string | null
+          user_owner_subscription_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          itemlines_id?: string | null
+          subscription_customer_id?: string | null
+          subscription_id?: string
+          subscription_invoice_id?: string
+          subscription_status?: string | null
+          updated_at?: string | null
+          user_owner_subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_itemlines_id_fkey"
+            columns: ["itemlines_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_lineitems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_user_owner_subscription_id_fkey"
+            columns: ["user_owner_subscription_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_lineitems: {
+        Row: {
+          created_at: string
+          id: string
+          line_items_id: string
+          price_id: string
+          product_id: string
+          productname: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_items_id: string
+          price_id: string
+          product_id: string
+          productname?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_items_id?: string
+          price_id?: string
+          product_id?: string
+          productname?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       workspace: {
         Row: {
           created_at: string
@@ -233,6 +317,26 @@ export type Database = {
           p_user_id: string
           p_user_type: string
           p_workspace_name: string
+        }
+        Returns: undefined
+      }
+      insert_subscription: {
+        Args: {
+          l_item_created_at: string
+          l_item_id: string
+          l_item_price_id: string
+          l_item_product_id: string
+          l_item_productname: string
+          l_item_updated_at: string
+          s_created_at: string
+          s_cus_id: string
+          s_expires_at: string
+          s_id: string
+          s_inv_id: string
+          s_status: string
+          s_sub_id: string
+          s_updated_at: string
+          s_user_id: string
         }
         Returns: undefined
       }

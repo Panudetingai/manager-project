@@ -1,3 +1,4 @@
+import webhook from "@/lib/stripe/api";
 import { default as auth_callback } from "@/modules/auth/server/route";
 import workspace from "@/modules/manager/server/routes/workspace";
 import { cors } from "@elysiajs/cors";
@@ -10,7 +11,8 @@ const app = new Elysia({ prefix: "/api" })
   )
   .get("/welcome", () => "Hello World")
   .use(auth_callback)
-  .use(workspace);
+  .use(workspace)
+  .use(webhook)
 
 export const GET = (req: Request) => app.handle(req);
 export const POST = (req: Request) => app.handle(req);

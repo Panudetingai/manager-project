@@ -1,5 +1,6 @@
 "use server";
 import { getUserServer } from "@/lib/supabase/getUser-server";
+import redis from "@/lib/upstash";
 import { Database } from "../../../../../../utils/supabase/database.types";
 import { createClient } from "../../../../../../utils/supabase/server";
 import { tableInvitationType } from "../../invitations/table-list-invitations";
@@ -66,6 +67,8 @@ export async function approveInvitation({
   });
 
   if (error) return { error };
+
+  await redis.del(`workspaces:${value.user_owner_id}`);
 
   return "success approve invitation";
 }

@@ -49,6 +49,8 @@ export async function workspaceRedirect(request: NextRequest) {
         : []),
     ];
 
+    console.log("allWorkspaces", allWorkspaces);
+
     await redis.set(cacheKey, allWorkspaces, {ex: 60 * 60})
   }
 
