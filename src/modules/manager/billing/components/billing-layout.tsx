@@ -1,41 +1,43 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsContents,
+  TabsList,
+  TabsTrigger,
+} from "@/components/animate-ui/components/animate/tabs";
+import { useState } from "react";
+import CardBillingPlan from "./card-billing-plan";
 
-type BillingInfoType = {
-  plan: string;
-  plandescription: string;
-  pricedescription?: string;
-  price: string;
-  items: Record<string, string>[];
-};
+export default function BillingLayout({ team }: { team: string }) {
+  const [billingCycle, setBillingCycle] = useState<"month" | "year">(
+    "month"
+  );
 
-const BillingInfo: BillingInfoType[] = [
-  {
-    plan: "Free",
-    plandescription: "For personal use and small teams.",
-    price: "$0",
-    pricedescription: "per month",
-    items: [{ Projects: "3" }, { Storage: "1 GB" }, { Users: "2" }],
-  },
-];
-
-export default function BillingLayout() {
   return (
     <div className="flex flex-col w-full h-full">
-      <h1 className="text-lg font-medium">Subscription Plan</h1>
-      <div className="flex items-center w-full">{BillingInfo.map((info) => (
-        <Card key={info.plan} className="p-2">
-            <CardContent>
-                <div className="flex flex-col space-y-2">
-                    <h2 className="text-lg font-semibold">{info.plan}</h2>
-                    <p>{info.plandescription}</p>
-                    <span>{info.price}</span>
-                    <span className="text-sm text-muted-foreground">{info.pricedescription}</span>
-                </div>
-            </CardContent>
-        </Card>
-      ))}</div>
+      <Tabs
+        value={billingCycle}
+        onValueChange={(value: string) =>
+          setBillingCycle(value as "month" | "year")
+        }
+      >
+        <div className="flex justify-between items-center">
+          <h1 className="text-lg font-medium">Subscription Plan</h1>
+          <TabsList>
+            <TabsTrigger value="month">Monthly</TabsTrigger>
+            <TabsTrigger value="year">Yearly</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContents>
+          <TabsContent value={billingCycle} className="w-full">
+            <div className="flex items-center w-full flex-col space-y-4 mt-4">
+              <CardBillingPlan billingCycle={billingCycle} team={team} />
+            </div>
+          </TabsContent>
+        </TabsContents>
+      </Tabs>
     </div>
   );
 }
