@@ -3,18 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import pathsConfig from "../../../../config/app.router";
 import { createClient } from "../../../../utils/supabase/server";
 
-type OwnedWorkspace = {
-  name: string;
-  id: string;
-};
-
-type MemberWorkspace = {
-  name: string;
-  workspace_icon: string | null;
-};
-
-type Workspace = OwnedWorkspace | MemberWorkspace;
-
 export async function workspaceRedirect(request: NextRequest) {
   const supabase = await createClient();
   const pathParts = request.nextUrl.pathname.split("/");
