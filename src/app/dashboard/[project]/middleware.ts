@@ -1,5 +1,4 @@
 import { getUserServer } from "@/lib/supabase/getUser-server";
-import redis from "@/lib/upstash";
 import { NextRequest, NextResponse } from "next/server";
 import pathsConfig from "../../../../config/app.router";
 import { createClient } from "../../../../utils/supabase/server";
@@ -24,12 +23,7 @@ export async function workspaceRedirect(request: NextRequest) {
 
   if (!user) return;
 
-  // redis cache worksapce list per user could be implemented here for optimization
-  const cacheKey = `workspaces:${user.id}`;
-  let allWorkspaces = await redis.get(cacheKey) as Workspace[] | null;
-
   // ดึง workspace ที่ user เป็นเจ้าของ
-  if (!allWorkspaces) {
     const { data: workspaces } = await supabase
       .from("workspace")
       .select("name, id")
@@ -42,17 +36,12 @@ export async function workspaceRedirect(request: NextRequest) {
       .eq("user_id_owner_id", user.id)
       .eq("workspace.name", params.project || "");
 
-    allWorkspaces = [
+    const allWorkspaces = [
       ...(workspaces ?? []),
       ...(Array.isArray(memberWorkspaces)
         ? memberWorkspaces.map((m) => m.workspace).filter(Boolean)
         : []),
     ];
-
-    console.log("allWorkspaces", allWorkspaces);
-
-    await redis.set(cacheKey, allWorkspaces, {ex: 60 * 60})
-  }
 
   const found = allWorkspaces.find((w) => w.name === params.project);
 

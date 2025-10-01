@@ -65,6 +65,7 @@ export function SidebarBanner() {
       const { data } = await supabase
         .from("workspace_member")
         .select("role, workspace:workspace_owner_id(id, name, workspace_icon)")
+
         .eq("user_id_owner_id", user!.id);
       if (!data) return [];
       return data;
@@ -156,15 +157,13 @@ export function SidebarBanner() {
                     className={`w-full ${
                       project === workspace.name ? "font-medium" : ""
                     }`}
-                   onClick={() => {
-                    router.push(`/dashboard/${workspace.name}`);
-                   }}
+                    onClick={() => {
+                      router.push(`/dashboard/${workspace.name}`);
+                    }}
                   >
                     <Icon
                       className={`mr-2 h-4 w-4 ${
-                        project === workspace.name
-                          ? "text-foreground"
-                          : ""
+                        project === workspace.name ? "text-foreground" : ""
                       }`}
                     />
                     {workspace.name}
@@ -184,12 +183,20 @@ export function SidebarBanner() {
                 return (
                   <DropdownMenuItem
                     key={member.workspace.name}
-                    className="w-full"
+                    className={`w-full ${
+                      project === member.workspace.name ? "font-medium" : ""
+                    }`}
                     onClick={() => {
                       router.push(`/dashboard/${member.workspace.name}`);
                     }}
                   >
-                    <Icon className="mr-2 h-4 w-4" />
+                    <Icon
+                      className={`mr-2 h-4 w-4 ${
+                        project === member.workspace.name
+                          ? "text-foreground"
+                          : ""
+                      }`}
+                    />
                     {member.workspace.name}
                   </DropdownMenuItem>
                 );
