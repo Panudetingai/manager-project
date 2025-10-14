@@ -12,11 +12,19 @@ export async function getProducts() {
 
 export async function BillingInfo() {
   const products = await getProducts();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("subscription_user_role")
+    .select("user_role")
+    .single();
 
   const billingInfo = await fucngetProducts({
     products,
   });
-  return billingInfo;
+  return {
+    billingInfo,
+    userRole: data?.user_role || "Free",
+  };
 }
 
 export async function CheckoutSession(
@@ -46,12 +54,12 @@ export async function CheckoutComplete(
   const stripe = CreateServiceStripe();
   const userCheckout = await stripe.retrieveCheckoutSession(data.id);
   const productsRole = await stripe.getProduct(
-    userCheckout.data.map((Item) => (Item && Item.price?.product as string)).join(",") ||
-      ""
+    userCheckout.data
+      .map((Item) => Item && (Item.price?.product as string))
+      .join(",") || ""
   );
 
   // You can handle post-checkout logic here, such as updating your database
-
   const { data: subscriptionData, error } = await supabase.rpc(
     "insert_subscription",
     {
@@ -83,14 +91,27 @@ export async function CheckoutComplete(
 
   if (error) return console.error("Error inserting subscription:", error);
 
-  const {error: roleupdate} = await supabase.from("subscription_user_role").upsert({
-    user_owner_id: data.metadata?.user_id as string,
-    user_role: (productsRole.metadata?.plan === "Premium" || productsRole.metadata?.plan === "Pro")
-      ? productsRole.metadata?.plan
-      : undefined
-  });
+  const { error: roleupdate } = await supabase
+    .from("subscription_user_role")
+    .upsert({
+      user_owner_id: data.metadata?.user_id as string,
+      user_role:
+        productsRole.metadata?.plan === "Premium" ||
+        productsRole.metadata?.plan === "Pro"
+          ? productsRole.metadata?.plan
+          : undefined,
+    });
 
   if (roleupdate) console.error("Error updating user role:", roleupdate);
 
   return subscriptionData;
+}
+
+export async function BillingPortalCreate(
+  customerId: string,
+  returnUrl: string
+) {
+  const stripe = CreateServiceStripe();
+  const portal = await stripe.BillingPortalSession(customerId, returnUrl);
+  return portal.url;
 }

@@ -10,5 +10,7 @@ export async function stripeWebhook(event: Stripe.Event) {
     case "checkout.session.completed":
         await CheckoutComplete(event as Stripe.CheckoutSessionCompletedEvent);
         break;
+    case "billing_portal.configuration.updated":
+      await  
   }
 }
