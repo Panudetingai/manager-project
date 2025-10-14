@@ -1,4 +1,5 @@
-import fs from "fs";
+ /* eslint-disable @typescript-eslint/no-require-imports */
+const fs = require("fs");
 const version = process.env.NEXT_PUBLIC_VESIGN || Date.now().toString();
 const sha = process.env.VERCEL_GIT_COMMIT_SHA || "dev";
 
