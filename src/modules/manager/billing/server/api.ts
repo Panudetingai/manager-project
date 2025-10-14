@@ -24,6 +24,8 @@ export async function BillingInfo() {
     .eq("user_owner_id", user && user.id ? user.id : "none")
     .single();
 
+  if (error) console.error("Error fetching billing information:", error);
+
   const billingInfo = await fucngetProducts({
     products,
   });
