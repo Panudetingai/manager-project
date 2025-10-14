@@ -163,6 +163,38 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_user_role: {
+        Row: {
+          cus_id: string
+          id: string
+          Interval: string
+          user_owner_id: string
+          user_role: Database["public"]["Enums"]["subscription_role"]
+        }
+        Insert: {
+          cus_id?: string
+          id?: string
+          Interval?: string
+          user_owner_id: string
+          user_role?: Database["public"]["Enums"]["subscription_role"]
+        }
+        Update: {
+          cus_id?: string
+          id?: string
+          Interval?: string
+          user_owner_id?: string
+          user_role?: Database["public"]["Enums"]["subscription_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_user_role_user_owner_id_fkey"
+            columns: ["user_owner_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace: {
         Row: {
           created_at: string
@@ -353,6 +385,7 @@ export type Database = {
       }
     }
     Enums: {
+      subscription_role: "Premium" | "Pro"
       user_roles: "admin" | "user" | "guest" | "owner"
       workspace_role: "member" | "admin"
       workspace_status: "pending" | "cancel" | "reject" | "answer"
@@ -483,6 +516,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      subscription_role: ["Premium", "Pro"],
       user_roles: ["admin", "user", "guest", "owner"],
       workspace_role: ["member", "admin"],
       workspace_status: ["pending", "cancel", "reject", "answer"],

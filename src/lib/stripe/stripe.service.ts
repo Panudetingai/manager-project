@@ -72,7 +72,7 @@ class StripeService {
       cancel_url: cancel_url,
       mode: mode,
       line_items: [{ price: priceId, quantity: 1 }],
-      metadata: { user_id }
+      metadata: { user_id },
     });
     return session;
   }
@@ -83,13 +83,56 @@ class StripeService {
    * @returns The retrieved checkout session
    */
 
-  public async retrieveCheckoutSession(
-    sessionId: string
-  ) {
+  public async retrieveCheckoutSession(sessionId: string) {
     const session = await StripeService.stripe.checkout.sessions.listLineItems(
       sessionId
     );
     return session;
+  }
+  /**
+   *
+   * @returns
+   */
+
+  public async getProduct(productId: string) {
+    const product = await StripeService.stripe.products.retrieve(productId);
+    return product;
+  }
+
+  /**
+   *
+   * @param sessionId
+   * @returns
+   */
+
+  public async cancelCheckoutSession(sessionId: string) {
+    const session = await StripeService.stripe.checkout.sessions.expire(
+      sessionId
+    );
+    return session;
+  }
+
+  /**
+   *
+   * @param customerId
+   * @param returnUrl
+   * @returns
+   */
+
+  public async BillingPortalSession(customerId: string, returnUrl: string) {
+    const session = await StripeService.stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+    return session;
+  }
+
+  /**
+   * 
+   */
+
+  public async BillingPortalSessionUpdate(){
+    
   }
 }
 

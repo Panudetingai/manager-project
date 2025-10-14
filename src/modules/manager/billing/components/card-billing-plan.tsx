@@ -9,7 +9,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Stripe from "stripe";
 import pathsConfig from "../../../../../config/app.router";
-import { BillingInfo, CheckoutSession } from "../server/api";
+import { createClient } from "../../../../../utils/supabase/client";
+import {
+  BillingInfo,
+  BillingPortalCreate,
+  CheckoutSession,
+} from "../server/api";
 
 export type BillingInfoType = {
   plan: string;
@@ -56,14 +61,33 @@ export default function CardBillingPlan({
       successurl: string;
       cancelurl: string;
     }) => {
-      const checkout = await CheckoutSession(
-        user_id,
-        price,
-        successurl,
-        cancelurl,
-        mode
-      );
-      return checkout;
+      // check customer subscription and redirect to portal if active
+      const supabase = createClient();
+      const { data: subscription } = await supabase
+        .from("subscription")
+        .select("*")
+        .eq("user_owner_subscription_id", user_id)
+        .eq("subscription_status", "complete")
+        .single();
+
+      if (subscription) {
+        if (!subscription.subscription_customer_id)
+          throw new Error("No customer id");
+        const billingPortal = await BillingPortalCreate(
+          subscription.subscription_customer_id,
+          `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+        );
+        return billingPortal;
+      } else {
+        const checkout = await CheckoutSession(
+          user_id,
+          price,
+          successurl,
+          cancelurl,
+          mode
+        );
+        return checkout;
+      }
     },
     onSuccess: (data) => {
       setIsPending("");
@@ -78,8 +102,9 @@ export default function CardBillingPlan({
 
   return (
     <>
-      {Billing?.filter((info) => info.billingCycle === billingCycle).map(
-        (info) => (
+      {Billing?.billingInfo
+        ?.filter((info) => info.billingCycle === billingCycle)
+        .map((info) => (
           <Card key={info.plan} className="w-full p-0">
             <CardContent className="flex flex-row justify-between p-0">
               <div className="flex flex-col space-y-2 flex-1 border-r p-6">
@@ -94,7 +119,10 @@ export default function CardBillingPlan({
                   {info.pricedescription}
                 </span>
                 <Button
-                  disabled={isPending === info.priceId}
+                  disabled={
+                    isPending === info.priceId ||
+                    Billing.userRole === info.plan
+                  }
                   onClick={() => {
                     setIsPending(info.priceId);
                     createCheckoutSession({
@@ -122,7 +150,9 @@ export default function CardBillingPlan({
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
                     <span>
-                      {info.plan === "Free" ? "Current Plan" : "Choose Plan"}
+                      {Billing.userRole === info.plan
+                        ? "Current Plan"
+                        : "Choose Plan"}
                     </span>
                   )}
                 </Button>
@@ -149,8 +179,7 @@ export default function CardBillingPlan({
               </div>
             </CardContent>
           </Card>
-        )
-      )}
+        ))}
     </>
   );
 }
