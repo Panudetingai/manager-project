@@ -1,6 +1,6 @@
  /* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("fs");
-const version = process.env.NEXT_PUBLIC_VESIGN || Date.now().toString();
+const version = process.env.NEXT_PUBLIC_VERSION || "dev";
 const sha = process.env.VERCEL_GIT_COMMIT_SHA || "dev";
 
 fs.writeFileSync(
