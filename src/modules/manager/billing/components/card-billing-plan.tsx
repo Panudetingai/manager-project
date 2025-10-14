@@ -63,15 +63,12 @@ export default function CardBillingPlan({
     }) => {
       // check customer subscription and redirect to portal if active
       const supabase = createClient();
-      console.log("userId: ", user_id);
       const { data: subscription } = await supabase
         .from("subscription")
         .select("*")
         .eq("user_owner_subscription_id", user_id)
         .eq("subscription_status", "complete")
         .single();
-
-      console.log(subscription);
 
       if (subscription) {
         if (!subscription.subscription_customer_id)
@@ -124,7 +121,7 @@ export default function CardBillingPlan({
                 <Button
                   disabled={
                     isPending === info.priceId ||
-                    Billing.userRole === info.plan.replace(/\s*\(.*?\)/g, "")
+                    Billing.userRole === info.plan
                   }
                   onClick={() => {
                     setIsPending(info.priceId);
@@ -153,7 +150,7 @@ export default function CardBillingPlan({
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
                     <span>
-                      {Billing.userRole === info.plan.replace(/\s*\(.*?\)/g, "")
+                      {Billing.userRole === info.plan
                         ? "Current Plan"
                         : "Choose Plan"}
                     </span>

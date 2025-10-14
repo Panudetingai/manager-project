@@ -51,7 +51,6 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
   const { mutate, isPending } = useMutation({
     mutationFn: createWorkspaceAPI,
     onSuccess: async (data) => {
-      console.log(data);
       router.push(data.name);
     },
     onError: (error) => {

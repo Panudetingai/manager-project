@@ -165,17 +165,23 @@ export type Database = {
       }
       subscription_user_role: {
         Row: {
+          cus_id: string
           id: string
+          Interval: string
           user_owner_id: string
           user_role: Database["public"]["Enums"]["subscription_role"]
         }
         Insert: {
+          cus_id?: string
           id?: string
+          Interval?: string
           user_owner_id: string
           user_role?: Database["public"]["Enums"]["subscription_role"]
         }
         Update: {
+          cus_id?: string
           id?: string
+          Interval?: string
           user_owner_id?: string
           user_role?: Database["public"]["Enums"]["subscription_role"]
         }

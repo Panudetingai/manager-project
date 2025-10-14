@@ -1,9 +1,9 @@
 import {
-    LayoutDashboard,
-    LucideIcon,
-    Settings,
-    Users,
-    Workflow
+  LayoutDashboard,
+  LucideIcon,
+  Settings,
+  Users,
+  Workflow
 } from "lucide-react";
 
 type SidebarItem = {

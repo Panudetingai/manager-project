@@ -1,4 +1,4 @@
-import { CheckoutComplete } from "@/modules/manager/billing/server/api";
+import { CheckoutComplete, CustomerSubscriptionUpdated } from "@/modules/manager/billing/server/api";
 import { QueryClient } from "@tanstack/react-query";
 import Stripe from "stripe";
 
@@ -10,7 +10,7 @@ export async function stripeWebhook(event: Stripe.Event) {
     case "checkout.session.completed":
         await CheckoutComplete(event as Stripe.CheckoutSessionCompletedEvent);
         break;
-    case "billing_portal.configuration.updated":
-      await  
+    case "customer.subscription.updated":
+      await CustomerSubscriptionUpdated(event as Stripe.CustomerSubscriptionUpdatedEvent);
   }
 }
