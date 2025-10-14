@@ -1,7 +1,8 @@
-import { Toaster } from "@/components/ui/sonner";
 import { generateRootMetadata } from "@/lib/meta-data";
 import ClientSSR from "@/lib/providers/clinet-ssr";
 import QueryProvider from "@/lib/providers/query-provider";
+import { Toaster } from "sonner";
+import Appnotifyupdate from "./app-notify-update";
 import "./globals.css";
 
 export default function RootLayout({
@@ -15,7 +16,8 @@ export default function RootLayout({
         <QueryProvider>
           <ClientSSR>{children}</ClientSSR>
         </QueryProvider>
-        <Toaster richColors position="top-right" />
+        <Toaster position="top-right" />
+        <Appnotifyupdate />
       </body>
     </html>
   );
