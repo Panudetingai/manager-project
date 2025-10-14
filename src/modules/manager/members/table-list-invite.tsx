@@ -151,7 +151,6 @@ export default function TableListInvite() {
           </Table>
       </div>
       <ModalInvite isopen={isopen} setisopen={setisopen} />
-
     </>
   );
 }
