@@ -8,7 +8,7 @@ export default function Appnotifyupdate() {
       .then((response) => response.json())
       .then((data) => {
         const currentVersion = process.env.NEXT_PUBLIC_VESIGN;
-        const currentShaVersion = process.env.NEXT_PUBLIC_SHA_VERSION;
+        const currentShaVersion = process.env.VERCEL_GIT_COMMIT_SHA;
         const lastAlertVersion = window.localStorage.getItem("alert-version");
 
         const newAlertVersion = `${data.version}-${data.sha_version}`;
