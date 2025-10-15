@@ -30,15 +30,17 @@ import {
 } from "../schema/form-workspace";
 import { createWorkspaceAPI } from "../server/workspace-create";
 
-
-type Props ={
-    workspaces: {
+type Props = {
+  workspaces:
+    | {
         name: string;
         workspace_icon: string | null;
-    }[] | null | undefined;
-}
+      }[]
+    | null
+    | undefined;
+};
 
-export default function CreateWorkspaceForm({workspaces}: Props) {
+export default function CreateWorkspaceForm({ workspaces }: Props) {
   const router = useRouter();
   const form = useForm<FormWorkspaceType>({
     resolver: zodResolver(FormWorkspaceSchema),
@@ -51,7 +53,7 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
   const { mutate, isPending } = useMutation({
     mutationFn: createWorkspaceAPI,
     onSuccess: async (data) => {
-      router.push(data.name);
+      window.location.href = `${data.name}`;
     },
     onError: (error) => {
       console.log(error);
@@ -60,13 +62,15 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
 
   useEffect(() => {
     const subscription = form.watch((value) => {
-        const isExist = workspaces?.find((ws) => ws.name === value.workspacename);
-        if (isExist) {
-            form.setError("workspacename", { message: "Workspace name already exists" });
-        } else {
-            form.clearErrors("workspacename");
-        }
-    })
+      const isExist = workspaces?.find((ws) => ws.name === value.workspacename);
+      if (isExist) {
+        form.setError("workspacename", {
+          message: "Workspace name already exists",
+        });
+      } else {
+        form.clearErrors("workspacename");
+      }
+    });
     return () => subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form]);
@@ -74,8 +78,10 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
   const handlesubmit = form.handleSubmit((data) => {
     const isExist = workspaces?.find((ws) => ws.name === data.workspacename);
     if (isExist) {
-        form.setError("workspacename", { message: "Workspace name already exists" });
-        return;
+      form.setError("workspacename", {
+        message: "Workspace name already exists",
+      });
+      return;
     }
     mutate(data);
   });
@@ -133,7 +139,9 @@ export default function CreateWorkspaceForm({workspaces}: Props) {
               <LoaderCircle className="animate-spin" />
               <span>Creating...</span>
             </>
-          ) : "Create Workspace"}
+          ) : (
+            "Create Workspace"
+          )}
         </Button>
       </form>
     </Form>
