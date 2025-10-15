@@ -13,7 +13,7 @@ const workspace = new Elysia().get("/workspaces", async () => {
   const supabase = await createClient();
   const user = await getUserServer();
   if (!user) return [];
-
+  
   const cacheKey = `workspaces:${user.id}`;
   const cached = await redis.get(cacheKey) as string | null;
   if (cached) return cached as unknown as workspacesType[];
@@ -25,7 +25,9 @@ const workspace = new Elysia().get("/workspaces", async () => {
 
   if (error) throw new Error("Fetch workspaces failed");
 
-  await redis.set(cacheKey, JSON.stringify(workspaces), { ex: 60 * 60 });
+  if (workspaces && workspaces.length > 0) {
+    await redis.set(cacheKey, JSON.stringify(workspaces), { ex: 60 * 60 });
+  }
   return workspaces;
 });
 
