@@ -14,12 +14,12 @@ import { useUserClient } from "@/lib/supabase/getUser-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, UserPlusIcon } from "lucide-react";
 import { useState } from "react";
+import { createClient } from "../../../../utils/supabase/client";
+import { useWorkspaceState } from "../store/workspace-state";
 import {
   inviteMember,
   InviteMemberparams,
 } from "./server/action/workspace-member";
-import { createClient } from "../../../../utils/supabase/client";
-import { useWorkspaceState } from "../store/workspace-state";
 
 type Props = {
   isopen: boolean;
@@ -32,6 +32,7 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
   const { workspaceId } = useWorkspaceState();
   const { data: user } = useUserClient();
   const queryClient = useQueryClient();
+  const [loadingUserId, setLoadingUserId] = useState<string | null>(null);
 
   const { data: users } = useQuery({
     queryKey: ["searchmember", searchTerm],
@@ -48,15 +49,19 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
     staleTime: 1000,
   });
 
-  const { mutate, isPending } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: async ({
       workspace_owner_id: workspaceId,
       user_owner_id: userId,
     }: InviteMemberparams) => {
+      setLoadingUserId(userId);
       return await inviteMember({ workspace_owner_id: workspaceId, user_owner_id: userId });
     }, onSuccess: async () => {
+      setLoadingUserId(null);
       await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       setisopen(false);
+    }, onError: () => {
+      setLoadingUserId(null);
     }
   });
 
@@ -94,14 +99,14 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
                   </div>
                   <Button
                     className="rounded-sm cursor-pointer"
-                    disabled={isPending}
+                    disabled={loadingUserId === user.id}
                     size={"sm"}
                     onClick={() => mutate({
                       workspace_owner_id: workspaceId || "",
                       user_owner_id: user.id,
                     })}
                   >
-                    {isPending ? (
+                    {loadingUserId === user.id ? (
                       <>
                         <LoaderCircle className="animate-spin" />
                         Inviting...
