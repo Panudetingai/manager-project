@@ -4,6 +4,7 @@ import redis from "@/lib/upstash";
 import { Database } from "../../../../../../utils/supabase/database.types";
 import { createClient } from "../../../../../../utils/supabase/server";
 import { tableInvitationType } from "../../invitations/table-list-invitations";
+import { sendInvitationNotify } from "./socket";
 
 export async function cancelInvite(id: string) {
   const supabase = await createClient();
@@ -41,6 +42,7 @@ export async function inviteMember({
 
   if (error) return { error };
 
+  sendInvitationNotify(user);
   return "success invite member";
 }
 
@@ -95,7 +97,7 @@ export async function cancelInvitation({
 export async function updateRoleMember({
   memberId,
   user_owner_id,
-  role
+  role,
 }: {
   memberId: string;
   user_owner_id: string;
