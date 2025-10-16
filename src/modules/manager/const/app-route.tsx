@@ -46,7 +46,7 @@ export const APP_ROUTE: AppRoute[] = [
         label: "Members",
         path: "",
         icon: Users2,
-        role: ["owner", "admin"],
+        role: ["owner", "admin", "user"],
         submenu: [
           {
             label: "Team Members",

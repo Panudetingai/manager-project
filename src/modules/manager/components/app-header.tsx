@@ -5,13 +5,39 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import SocketClient from "@/lib/socket";
+import SocketServer from "@/lib/socket";
+import { getUserClient } from "@/lib/supabase/getUser-client";
+import { useQuery } from "@tanstack/react-query";
 import { AppBreadcrumb } from "./app-breadcrumb";
-import AppNotify from "./app-notify";
+import AppNotify, { NotificationType } from "./app-notify";
 
 export default function AppHeader() {
+  const socket = SocketServer("1234");
 
-  const socket = SocketClient();
+  const { data: user } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: async () => {
+      const user = await getUserClient();
+      return user;
+    }
+  })
+
+  const sendTestNotification = () => {
+    if (!user) throw new Error("User not authenticated");
+    socket.emit("send-notification", {
+      id: (socket.id || "unknown-socket-id") + Date.now(),
+      user_info: {
+        id: user.id,
+        avatar: user.user_metadata.avatar_url || "",
+        username: user.user_metadata.full_name || "Unknown User",
+      },
+      title: "Test Notification",
+      type: "request",
+      detail: "This is a test notification from the manager app.",
+      date: new Date(),
+      is_read: false,
+    } as NotificationType)
+  }
 
   return (
     <SidebarInset>
@@ -26,13 +52,7 @@ export default function AppHeader() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              socket.emit("send-notification", {
-                toUserId: "user1235",
-                title: "New Notification",
-                message: "This is a test notification from the manager app.",
-              });
-            }}
+            onClick={sendTestNotification}
           >
             Send Notification
           </Button>
