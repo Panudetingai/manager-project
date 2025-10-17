@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import SocketServer from "@/lib/socket";
+import { useSocket } from "@/lib/providers/socket-provider";
 import { Bell, Inbox } from "lucide-react";
 import { useEffect, useState } from "react";
 import { countNotify, getTimeAgo } from "../lib/app-notify";
@@ -35,7 +35,7 @@ export interface NotificationType {
 }
 
 export default function AppNotify() {
-  const socket = SocketServer("1234");
+  const socket = useSocket();
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
   useEffect(() => {
@@ -101,8 +101,8 @@ export default function AppNotify() {
                   (a, b) =>
                     new Date(b.date).getTime() - new Date(a.date).getTime()
                 )
-                .map((item) => (
-                  <div className="flex flex-col p-3" key={item.id}>
+                .map((item, index) => (
+                  <div className="flex flex-col p-3" key={index}>
                     <div className="flex gap-2">
                       <Avatar className="w-10 h-10 mt-0.5 relative">
                         <AvatarImage

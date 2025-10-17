@@ -5,14 +5,14 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import SocketServer from "@/lib/socket";
+import { useSocket } from "@/lib/providers/socket-provider";
 import { getUserClient } from "@/lib/supabase/getUser-client";
 import { useQuery } from "@tanstack/react-query";
 import { AppBreadcrumb } from "./app-breadcrumb";
 import AppNotify, { NotificationType } from "./app-notify";
 
 export default function AppHeader() {
-  const socket = SocketServer("1234");
+  const socket = useSocket();
 
   const { data: user } = useQuery({
     queryKey: ["user-profile"],
@@ -25,7 +25,7 @@ export default function AppHeader() {
   const sendTestNotification = () => {
     if (!user) throw new Error("User not authenticated");
     socket.emit("send-notification", {
-      id: (socket.id || "unknown-socket-id") + Date.now(),
+      id: "4a900e38-fb0c-49d7-bd2a-2e7c5e995d5d",
       user_info: {
         id: user.id,
         avatar: user.user_metadata.avatar_url || "",

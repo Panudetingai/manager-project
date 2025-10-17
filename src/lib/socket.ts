@@ -6,14 +6,12 @@ export default function SocketServer(userId: string): Socket {
   }
 
   const socket = io(process.env.NEXT_PUBLIC_SOCKET_IO_URL, {
-    transports: ["websocket"],
-    reconnectionDelayMax: 10000,
     path: "/socket.io/",
-    auth: { userId },
-    query: {
-      "userId": userId  // ถ้าใช้ auth แล้ว อาจไม่ต้องใช้ query ก็ได้
-    }
+    auth: { userId: userId },
+    protocols: ["http", "https"],
+    autoConnect: true,
   });
+
   socket.on("connect", () => {
     console.log("Connected to socket server with ID:", socket.id);
   });
