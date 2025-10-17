@@ -52,7 +52,7 @@ export default function AppHeader() {
           <Button
             variant="outline"
             size="sm"
-            onClick={sendTestNotification}
+            onClick={() => sendTestNotification()}
           >
             Send Notification
           </Button>

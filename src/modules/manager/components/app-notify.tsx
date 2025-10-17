@@ -39,6 +39,7 @@ export default function AppNotify() {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
   useEffect(() => {
+    if (!socket) return;
     socket.on("app-notify", (data) => {
       console.log("Received notification:", data);
       setNotifications((prev) => [...prev, data]);
