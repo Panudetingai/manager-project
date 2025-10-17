@@ -42,7 +42,7 @@ export async function inviteMember({
 
   if (error) return { error };
 
-  sendInvitationNotify(user);
+  sendInvitationNotify(user, user_owner_id);
   return "success invite member";
 }
 
