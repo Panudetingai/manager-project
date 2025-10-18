@@ -20,6 +20,9 @@ const PathsSchema = z.object({
     onboarding: z.string().min(1),
     join: z.string().min(1)
   }),
+  feature: z.object({
+    aichat: z.string().min(1),
+  }),
   join: z.object({
     menubarjoin: z.string().min(1),
   })
@@ -47,6 +50,9 @@ const pathsConfig = PathsSchema.parse({
   },
   join: {
     menubarjoin: "/dashboard/join/[workspace]",
+  },
+  feature: {
+    aichat: "/dashboard/[workspace]/ai-chat",
   }
 } satisfies z.infer<typeof PathsSchema>);
 
