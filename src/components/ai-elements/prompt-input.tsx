@@ -1026,14 +1026,15 @@ interface SpeechRecognition extends EventTarget {
   lang: string;
   start(): void;
   stop(): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onresult:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any)
-    | null;
-  onerror:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any)
-    | null;
+   
+  onresult: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any) | null;
+  onerror: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any) | null;
 }
 
 interface SpeechRecognitionEvent extends Event {
