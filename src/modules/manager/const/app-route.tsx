@@ -1,4 +1,4 @@
-import { CirclePlus, CreditCard, LayoutDashboard, LucideIcon, Settings2, Users2, UsersRound } from "lucide-react";
+import { CirclePlus, CreditCard, LayoutDashboard, LucideIcon, Settings2, SparkleIcon, Users2, UsersRound } from "lucide-react";
 import z from "zod";
 import pathsConfig from "../../../../config/app.router";
 import { Database } from "../../../../utils/supabase/database.types";
@@ -82,13 +82,13 @@ export const APP_ROUTE: AppRoute[] = [
     ],
   },
   {
-    labelgroup: "Create New",
+    labelgroup: "Features",
     role: ["owner"],
     items: [
       {
-        label: "New Project",
-        path: "dashboard",
-        icon: LayoutDashboard,
+        label: "Chat AI Service",
+        path: pathsConfig.feature.aichat,
+        icon: SparkleIcon,
         role: ["owner"],
       }
     ]
