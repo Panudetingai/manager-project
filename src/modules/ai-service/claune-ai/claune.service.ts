@@ -1,5 +1,9 @@
+import { AnthropicModelId } from "@/modules/feature/types/ai-service/ai-service-type";
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { streamText, UIMessage } from "ai";
+import {
+  streamText,
+  UIMessage
+} from "ai";
 
 interface ClauneAIServiceConfig {
   apiKey?: string;
@@ -32,11 +36,15 @@ class ClauneAIService {
     return client;
   }
 
-  public generateText({ paramater }: { paramater: OptionParamater }) {
+  public async generateText({ paramater }: { paramater: OptionParamater }) {
     const client = this.createAnthropicProvider();
     const result = streamText({
-      model: client.chat(paramater.option.model as string),
+      model: client.chat(paramater.option.model as AnthropicModelId),
       messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant.",
+        },
         {
           role: "user",
           content: paramater.messages
@@ -45,14 +53,10 @@ class ClauneAIService {
             .filter((text): text is string => text !== undefined)
             .join("\n"),
         },
-        {
-          role: "system",
-          content: "You are a helpful assistant.",
-        },
       ],
     });
 
-    return result.toUIMessageStreamResponse();
+    return result;
   }
 }
 

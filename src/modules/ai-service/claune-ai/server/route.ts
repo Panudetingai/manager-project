@@ -1,27 +1,55 @@
+import { StreamTextResult, ToolSet } from "ai";
 import Elysia from "elysia";
 import { useAIService, type AIServiceTypeOption } from "../../ai.service";
 
-const AIServiceAPI = new Elysia()
-    .post("/claune-ai/chat", async (req) => {
-        const { typeai, options, messages } = req.body as AIServiceTypeOption;
-        const response = useAIService({
-            typeai: typeai,
-            options: options,
-            messages
-        });
+type GenerateChatTypes = "chat" | "think" | "search";
 
-        if (!response) throw new Error("AI Service not found");
+const AIServiceAPI = new Elysia().post("/chat", async (req) => {
+  const { typeai, options, messages, generatetype } =
+    req.body as AIServiceTypeOption;
 
-        console.log(JSON.stringify(options, null, 2))
+  const response = useAIService({
+    typeai: typeai,
+    options: options,
+    generatetype: generatetype,
+    messages,
+  });
 
-        const generatedText = response.generateText({
-            paramater: {
-                option: options,
-                messages: messages
-            },
-        });
+  if (!response) throw new Error("AI Service not found");
 
-        return generatedText;
-    })
+  switch (generatetype as GenerateChatTypes) {
+    case "chat":
+      const result = (await response.generateText({
+        paramater: {
+          option: options,
+          messages,
+        },
+      })) as StreamTextResult<ToolSet, never>;
+      return result.toUIMessageStreamResponse({
+        messageMetadata: ({ part }) => {
+          if (part.type === "start") {
+            return {
+              // This object is checked against your metadata type
+              model: "gpt-4o",
+            };
+          }
+          if (part.type === "finish") {
+            return {
+              model: part.finishReason,
+              totalTokens: part.totalUsage.totalTokens,
+            };
+          }
+        },
+      });
+    case "think":
+      // Implement think logic here
+      throw new Error("Think generation type not implemented yet");
+    case "search":
+      // Implement search logic here
+      throw new Error("Search generation type not implemented yet");
+    default:
+      throw new Error("Unsupported generation type");
+  }
+});
 
 export default AIServiceAPI;

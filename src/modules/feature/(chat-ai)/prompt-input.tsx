@@ -1,62 +1,71 @@
 "use client";
 
 import {
-    PromptInput,
-    PromptInputActionAddAttachments,
-    PromptInputActionMenu,
-    PromptInputActionMenuContent,
-    PromptInputActionMenuTrigger,
-    PromptInputAttachment,
-    PromptInputAttachments,
-    PromptInputBody,
-    PromptInputButton,
-    PromptInputFooter,
-    type PromptInputMessage,
-    PromptInputModelSelect,
-    PromptInputModelSelectContent,
-    PromptInputModelSelectItem,
-    PromptInputModelSelectTrigger,
-    PromptInputModelSelectValue,
-    PromptInputSpeechButton,
-    PromptInputSubmit,
-    PromptInputTextarea,
-    PromptInputTools,
+  PromptInput,
+  PromptInputActionAddAttachments,
+  PromptInputActionMenu,
+  PromptInputActionMenuContent,
+  PromptInputActionMenuTrigger,
+  PromptInputAttachment,
+  PromptInputAttachments,
+  PromptInputBody,
+  PromptInputButton,
+  PromptInputFooter,
+  type PromptInputMessage,
+  PromptInputModelSelect,
+  PromptInputModelSelectContent,
+  PromptInputModelSelectItem,
+  PromptInputModelSelectTrigger,
+  PromptInputModelSelectValue,
+  PromptInputSpeechButton,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { AIServiceTypeOption } from "@/modules/ai-service/ai.service";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, UIMessage } from "ai";
+import {
+  DefaultChatTransport,
+  UIDataTypes,
+  UIMessage,
+  UITools
+} from "ai";
 import { GlobeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ModelsType } from "../types/ai-service/ai-service-type";
 
-const models = [
-  { id: "gpt-4", name: "GPT-4" },
-  { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
-  { id: "claude-2", name: "Claude 2" },
-  { id: "claude-instant", name: "Claude Instant" },
-  { id: "palm-2", name: "PaLM 2" },
-  { id: "llama-2-70b", name: "Llama 2 70B" },
-  { id: "llama-2-13b", name: "Llama 2 13B" },
-  { id: "cohere-command", name: "Command" },
-  { id: "mistral-7b", name: "Mistral 7B" },
+const models: ModelsType[] = [
+  {
+    id: "claude-3-haiku-20240307",
+    name: "Claude 3 Haiku",
+    type: "anthropic",
+  },
+  { id: "gemma-3-12b-it", name: "Gemini 1.5 Flash", type: "gemini" },
 ];
 
 interface PromptInputBoxProps {
-  setMessageStream: (messages: UIMessage[]) => void;
+  setMessageStream: (messages: UIMessage<unknown, UIDataTypes, UITools>[]) => void;
 }
 
 const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
   const [text, setText] = useState<string>("");
-  const [model, setModel] = useState<string>(models[0].id);
+  const [model, setModel] = useState<ModelsType["id"]>(
+    "gemma-3-12b-it"
+  );
+  const [modelType, setModelType] = useState<"gemini" | "anthropic">(
+    "gemini"
+  );
 
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
 
   const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({
-      api: "/api/ai-service/claune-ai/chat",
+      api: "/api/ai-service/chat",
       body: {
-        typeai: "anthropic",
+        generatetype: useWebSearch ? "search" : "chat",
+        typeai: modelType,
         options: {
-          model: "claude-3-haiku-20240307",
+          model: model,
           maxOutputTokens: 1000,
           temperature: 0.7,
         },
@@ -64,11 +73,7 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
     }),
   });
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      setMessageStream(messages);
-    }
-  }, [messages]);
+  console.log("messages", messages)
 
   const handleSubmit = (message: PromptInputMessage) => {
     // If currently streaming or submitted, stop instead of submitting
@@ -100,6 +105,11 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
     setText("");
   };
 
+  useEffect(() => {
+    setMessageStream(messages);
+  }, [messages, setMessageStream]);
+
+
   return (
     <div className="flex flex-col justify-end size-full">
       <PromptInput globalDrop multiple onSubmit={handleSubmit}>
@@ -130,7 +140,19 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
               <GlobeIcon size={16} />
               <span>Search</span>
             </PromptInputButton>
-            <PromptInputModelSelect onValueChange={setModel} value={model}>
+            <PromptInputModelSelect
+              defaultValue={models[0].id}
+              value={model}
+              onValueChange={(value) => {
+                const selectedModel = models.find(
+                  (modelOption) => modelOption.id === value
+                );
+                if (selectedModel) {
+                  setModelType(selectedModel.type);
+                  setModel(selectedModel.id);
+                }
+              }}
+            >
               <PromptInputModelSelectTrigger>
                 <PromptInputModelSelectValue />
               </PromptInputModelSelectTrigger>
@@ -146,7 +168,10 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
               </PromptInputModelSelectContent>
             </PromptInputModelSelect>
           </PromptInputTools>
-          <PromptInputSubmit className="!h-8" status={status} />
+          <PromptInputSubmit
+            className="!h-8"
+            status={status}
+          />
         </PromptInputFooter>
       </PromptInput>
     </div>
