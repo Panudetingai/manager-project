@@ -2,18 +2,24 @@
 import {
   Conversation,
   ConversationContent,
+  ConversationEmptyState,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import { Message, MessageAvatar, MessageContent } from '@/components/ai-elements/message';
-import { Response } from "@/components/ai-elements/response";
-import { useAccountClient } from "@/lib/supabase/getUser-client";
-import { UIMessage } from "ai";
-import { useState } from "react";
+import {
+  Reasoning,
+  ReasoningContent,
+  ReasoningTrigger,
+} from "@/components/ai-elements/reasoning";
+import { ChatStatus } from "ai";
+import { SparkleIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
+import { Fragment } from "react";
 import PromptInputBox from "./(chat-ai)/prompt-input";
+import TextResponse, { MessageErrorResponse, ThinkingMessage } from "./(chat-ai)/text-reponse";
+import { useChatStore } from "./store/ai-service/chatStore";
 
 export default function Chatbox() {
-  const user = useAccountClient();
-  const [messages, setMessages] = useState<UIMessage[]>([]);
+  const {messages, status} = useChatStore()
 
   return (
     <div className={`flex flex-col gap-4`}>
@@ -23,36 +29,64 @@ export default function Chatbox() {
           Start a conversation with our AI-powered chat service.
         </p>
       </div>
-      <div className="relative flex size-full flex-col divide-y overflow-hidden h-[600px]">
-        <div className="flex flex-col h-full w-full">
+      <div className="relative flex size-full flex-col divide-y overflow-y-auto ">
+        <div className="flex flex-col max-h-[60vh] md:max-h-[70vh] lg:max-h-[75vh] overflow-y-auto">
           <Conversation>
-            <ConversationContent>
-              {messages.map(({...message }) => (
-                <Message from={message.role} key={message.id}>
-                  <MessageContent>
-                    {message.parts.map((part, i) => {
-                      switch (part.type) {
-                        case "text": // we don't use any reasoning or tool calls in this example
-                          return (
-                            <Response isAnimating key={`${message.id}-${i}`}>
-                              {part.text}
-                            </Response>
-                          );
-                        default:
-                          return null;
-                      }
-                    })}
-                  </MessageContent>
-                  <MessageAvatar src={user.data?.avatar_url || ""} name={user.data?.username || ""} />
-                </Message>
+            <ConversationContent className="flex flex-col gap-4 min-h-[60vh] max-h-[60vh] md:max-h-[70vh] lg:max-h-[75vh] xl:max-h-[75vh] xl:min-h-[75vh] overflow-y-auto">
+              {messages.length === 0 && status !== "submitted" && (
+                <ConversationEmptyState
+                  title="No messages yet"
+                  description="Type a message below to start the conversation."
+                  icon={<SparkleIcon />}
+                />
+              )}
+              {messages.map((message, messageIndex) => (
+                <Fragment key={messageIndex}>
+                  {message.parts.map((part, i) => {
+                    switch (part.type) {
+                      case "text":
+                        const isLastMessage = i === message.parts.length - 1;
+                        return (
+                          <TextResponse
+                            status={status as ChatStatus}
+                            key={i}
+                            index={i}
+                            message={message}
+                            partText={part}
+                            // regenerate={() => handleRegenerate("")}
+                            isLastMessage={isLastMessage}
+                          />
+                        );
+                      case "reasoning":
+                        return (
+                          <Reasoning
+                            key={`${message.id}-${i}`}
+                            className="w-full"
+                            isStreaming={i === message.parts.length - 1}
+                          >
+                            <ReasoningTrigger />
+                            <ReasoningContent>{part.text}</ReasoningContent>
+                          </Reasoning>
+                        );
+                      default:
+                        return null;
+                    }
+                  })}
+                </Fragment>
               ))}
+              <AnimatePresence mode="wait">
+                {status === "submitted" && <ThinkingMessage key="thinking" />}
+              </AnimatePresence>
+              <AnimatePresence>
+                {status === "error" && <MessageErrorResponse />}
+              </AnimatePresence>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
         </div>
       </div>
-      <div className="flex flex-col gap-2 flex-1 sticky bottom-0 w-full mb-2">
-            <PromptInputBox setMessageStream={setMessages} />
+      <div className="flex flex-col gap-2 flex-1 sticky bottom-2 w-full bg-background">
+        <PromptInputBox />
       </div>
     </div>
   );
