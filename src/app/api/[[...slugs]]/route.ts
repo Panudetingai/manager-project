@@ -1,5 +1,5 @@
 import webhook from "@/lib/stripe/api";
-import AIServiceAPI from "@/modules/ai-service/claune-ai/server/route";
+import AIServiceAPI from "@/modules/ai-service/server/route";
 import { default as auth_callback } from "@/modules/auth/server/route";
 import workspace from "@/modules/manager/server/routes/workspace";
 import { cors } from "@elysiajs/cors";

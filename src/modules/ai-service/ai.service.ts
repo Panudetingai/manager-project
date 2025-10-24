@@ -1,20 +1,22 @@
 import { streamText, UIMessage } from "ai";
+import { ModelsType } from "../feature/types/ai-service/ai-service-type";
 import { ClauneAIService } from "./claune-ai/claune.service";
 import { GeminiService } from "./gemini-ai/gemini.service";
+import { OpenRouterService } from "./openroute-ai/openrouter.service";
 
 type AIServiceTypeParameters = Parameters<typeof streamText>[0];
 
 export type AIServiceTypeOption = {
-  typeai: "openai" | "anthropic" | "gemini";
+  typeai: ModelsType["type"];
   generatetype: "chat" | "think" | "search";
   options: AIServiceTypeParameters;
   messages: UIMessage[];
 };
 
-type AIServiceReturen = ClauneAIService | GeminiService | undefined;
+type AIServiceReturen = ClauneAIService | GeminiService | OpenRouterService;
 
 class AIService {
-  private typeai: "openai" | "anthropic" | "gemini";
+  private typeai: ModelsType["type"];
   private options: AIServiceTypeParameters;
 
   constructor(options: AIServiceTypeOption) {
@@ -27,12 +29,12 @@ class AIService {
       case "anthropic":
         const anthropic = new ClauneAIService();
         return anthropic;
-      case "openai":
-        // Implement OpenAI service logic here
-        return;
       case "gemini":
         const gemini = new GeminiService();
         return gemini;
+      case "openrouter":
+        const openrouter = new OpenRouterService();
+        return openrouter;
       default:
         throw new Error("Unsupported AI service type");
     }

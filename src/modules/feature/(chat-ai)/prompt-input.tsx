@@ -24,14 +24,10 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { AIServiceTypeOption } from "@/modules/ai-service/ai.service";
 import { useChat } from "@ai-sdk/react";
-import {
-  DefaultChatTransport,
-  UIDataTypes,
-  UIMessage,
-  UITools
-} from "ai";
+import { DefaultChatTransport } from "ai";
 import { GlobeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useChatStore } from "../store/ai-service/chatStore";
 import { ModelsType } from "../types/ai-service/ai-service-type";
 
 const models: ModelsType[] = [
@@ -41,24 +37,24 @@ const models: ModelsType[] = [
     type: "anthropic",
   },
   { id: "gemma-3-12b-it", name: "Gemini 1.5 Flash", type: "gemini" },
+  {
+    id: "deepseek/deepseek-chat-v3.1:free",
+    name: "DeepSeek V3.1",
+    type: "openrouter",
+  },
 ];
 
-interface PromptInputBoxProps {
-  setMessageStream: (messages: UIMessage<unknown, UIDataTypes, UITools>[]) => void;
-}
 
-const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
+const PromptInputBox = () => {
   const [text, setText] = useState<string>("");
-  const [model, setModel] = useState<ModelsType["id"]>(
-    "gemma-3-12b-it"
-  );
-  const [modelType, setModelType] = useState<"gemini" | "anthropic">(
+  const [model, setModel] = useState<ModelsType["id"]>("gemma-3-12b-it");
+  const [modelType, setModelType] = useState<ModelsType["type"]>(
     "gemini"
   );
 
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
-
-  const { messages, sendMessage, status, stop } = useChat({
+  const { setMessage, setStatus, seterror } = useChatStore();
+  const { messages, sendMessage, status, stop, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/ai-service/chat",
       body: {
@@ -72,8 +68,6 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
       } as AIServiceTypeOption,
     }),
   });
-
-  console.log("messages", messages)
 
   const handleSubmit = (message: PromptInputMessage) => {
     // If currently streaming or submitted, stop instead of submitting
@@ -106,9 +100,21 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
   };
 
   useEffect(() => {
-    setMessageStream(messages);
-  }, [messages, setMessageStream]);
+    setMessage(messages);
+    setStatus(status)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, status]);
 
+  useEffect(() => {
+    const selectedModel = models.find((m) => m.id === model);
+    if (selectedModel) {
+      setModelType(selectedModel.type);
+    }
+  }, [model]);
+
+  if (error) {
+    seterror(error)
+  }
 
   return (
     <div className="flex flex-col justify-end size-full">
@@ -148,8 +154,10 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
                   (modelOption) => modelOption.id === value
                 );
                 if (selectedModel) {
-                  setModelType(selectedModel.type);
-                  setModel(selectedModel.id);
+                  setModel(() => {
+                    setModelType(selectedModel.type);
+                    return selectedModel.id;
+                  });
                 }
               }}
             >
@@ -168,10 +176,7 @@ const PromptInputBox = ({ setMessageStream }: PromptInputBoxProps) => {
               </PromptInputModelSelectContent>
             </PromptInputModelSelect>
           </PromptInputTools>
-          <PromptInputSubmit
-            className="!h-8"
-            status={status}
-          />
+          <PromptInputSubmit className="!h-8" status={status} />
         </PromptInputFooter>
       </PromptInput>
     </div>
