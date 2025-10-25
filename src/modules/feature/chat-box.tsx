@@ -10,35 +10,60 @@ import {
   ReasoningContent,
   ReasoningTrigger,
 } from "@/components/ai-elements/reasoning";
-import { ChatStatus } from "ai";
-import { SparkleIcon } from "lucide-react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { AnimatePresence } from "motion/react";
-import { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
+import { AIServiceTypeOption } from "../ai-service/ai.service";
+import ChatEmpty from "./(chat-ai)/chat-empty";
 import PromptInputBox from "./(chat-ai)/prompt-input";
-import TextResponse, { MessageErrorResponse, ThinkingMessage } from "./(chat-ai)/text-reponse";
-import { useChatStore } from "./store/ai-service/chatStore";
+import TextResponse, {
+  MessageErrorResponse,
+  ThinkingMessage,
+} from "./(chat-ai)/text-reponse";
+import { useChatControls } from "./store/ai-service/chatStore";
 
-export default function Chatbox() {
-  const {messages, status} = useChatStore()
+function Chatbox() {
+  const { modal, modalType, webSearch } = useChatControls();
+  const reasoningRef = React.useRef<HTMLDivElement>(null);
+
+  const { messages, sendMessage, status } = useChat({
+    experimental_throttle: 200,
+    transport: new DefaultChatTransport({
+      api: "/api/ai-service/chat",
+      body: {
+        generatetype: webSearch ? "search" : "chat",
+        typeai: modalType,
+        options: {
+          model: modal,
+          maxOutputTokens: 1000,
+          temperature: 0.7,
+        },
+      } as AIServiceTypeOption,
+    }),
+  });
+
+  useEffect(() => {
+    if (reasoningRef.current) {
+      setTimeout(() => {
+        reasoningRef.current?.scrollTo({
+          top: reasoningRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  }, []);
 
   return (
     <div className={`flex flex-col gap-4`}>
-      <div className="flex-1">
-        <h1 className="font-semibold text-xl">Welcome to ChatServiceAI</h1>
-        <p className="text-muted-foreground">
-          Start a conversation with our AI-powered chat service.
-        </p>
-      </div>
-      <div className="relative flex size-full flex-col divide-y overflow-y-auto ">
-        <div className="flex flex-col">
-          <Conversation  className="relative w-full" style={{ height: '500px' }}>
-            <ConversationContent className="flex flex-col gap-4 min-h-[60vh] max-h-[60vh] md:max-h-[70vh] lg:max-h-[65vh] xl:max-h-[75vh] xl:min-h-[75vh] overflow-y-auto">
+      <div className="relative size-full max-h-[70vh] h-[70vh]">
+        <div className="flex flex-col h-full">
+          <Conversation>
+            <ConversationContent>
               {messages.length === 0 && status !== "submitted" && (
-                <ConversationEmptyState
-                  title="No messages yet"
-                  description="Type a message below to start the conversation."
-                  icon={<SparkleIcon />}
-                />
+                <ConversationEmptyState className="justify-start items-start p-0">
+                  <ChatEmpty />
+                </ConversationEmptyState>
               )}
               {messages.map((message, messageIndex) => (
                 <Fragment key={messageIndex}>
@@ -48,12 +73,10 @@ export default function Chatbox() {
                         const isLastMessage = i === message.parts.length - 1;
                         return (
                           <TextResponse
-                            status={status as ChatStatus}
                             key={i}
                             index={i}
                             message={message}
                             partText={part}
-                            // regenerate={() => handleRegenerate("")}
                             isLastMessage={isLastMessage}
                           />
                         );
@@ -65,7 +88,9 @@ export default function Chatbox() {
                             isStreaming={i === message.parts.length - 1}
                           >
                             <ReasoningTrigger />
-                            <ReasoningContent>{part.text}</ReasoningContent>
+                            <ReasoningContent ref={reasoningRef}>
+                              {part.text}
+                            </ReasoningContent>
                           </Reasoning>
                         );
                       default:
@@ -78,7 +103,9 @@ export default function Chatbox() {
                 {status === "submitted" && <ThinkingMessage key="thinking" />}
               </AnimatePresence>
               <AnimatePresence>
-                {status === "error" && <MessageErrorResponse key={"messageError"} />}
+                {status === "error" && (
+                  <MessageErrorResponse key={"messageError"} />
+                )}
               </AnimatePresence>
             </ConversationContent>
             <ConversationScrollButton />
@@ -86,8 +113,10 @@ export default function Chatbox() {
         </div>
       </div>
       <div className="flex flex-col gap-2 flex-1 sticky bottom-2 w-full bg-background">
-        <PromptInputBox />
+        <PromptInputBox sendMessage={sendMessage} status={status} />
       </div>
     </div>
   );
 }
+
+export default React.memo(Chatbox);

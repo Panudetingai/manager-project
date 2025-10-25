@@ -28,6 +28,7 @@ const AIServiceAPI = new Elysia().post("/chat", async (req) => {
           messages,
         },
       })) as StreamTextResult<ToolSet, never>;
+      console.log(JSON.stringify(result, null, 2));
       return result.toUIMessageStreamResponse({
         sendReasoning: true,
         messageMetadata: ({ part }) => {
@@ -36,6 +37,12 @@ const AIServiceAPI = new Elysia().post("/chat", async (req) => {
               model: part.finishReason,
               totalTokens: part.totalUsage.totalTokens,
             };
+          }
+          if (part.type === "tool-result") {
+            return {
+              toolName: part.toolName,
+              toolCallId: part.toolCallId,
+            }
           }
         },
       });

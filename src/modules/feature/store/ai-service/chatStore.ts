@@ -1,5 +1,6 @@
 import { ChatStatus, UIDataTypes, UIMessage, UITools } from "ai";
 import { create } from "zustand";
+import { ModelsType } from "../../types/ai-service/ai-service-type";
 
 interface ChatStoreState {
   messages: UIMessage<unknown, UIDataTypes, UITools>[];
@@ -21,4 +22,22 @@ export const useChatStore = create<ChatStoreState>((set) => ({
   seterror: (error) => {
     set(() => ({ error }));
   },
+}));
+
+interface ChatControls {
+  modalType: ModelsType['type'];
+  setModalType: (type: ModelsType['type']) => void;
+  modal: ModelsType['id'];
+  setModal: (model: ModelsType['id']) => void;
+  webSearch?: boolean;
+  setWebSearch?: (useSearch: boolean) => void;
+}
+
+export const useChatControls = create<ChatControls>((set) => ({
+  modalType: 'groq',
+  modal: 'groq/compound',
+  webSearch: false,
+  setModalType: (type) => set(() => ({ modalType: type })),
+  setModal: (model) => set(() => ({ modal: model })),
+  setWebSearch: (useSearch) => set(() => ({ webSearch: useSearch })),
 }));

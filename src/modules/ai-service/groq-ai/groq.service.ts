@@ -36,7 +36,7 @@ class GroqService {
     return client;
   }
 
-  public generateText({paramater}: {paramater: OptionParameter}) {
+  public generateText({ paramater }: { paramater: OptionParameter }) {
     const client = this.createGrop();
     const result = streamText({
       model: client(paramater.option.model as GroqModelId),
@@ -54,14 +54,24 @@ class GroqService {
             .join("\n"),
         },
       ],
+      providerOptions: {
+        groq: {
+          parallelToolCalls: true, // Enable parallel function calling (default: true)
+          compound_custom: {
+            tools: {
+              enabled_tools: ["web_search"],
+            },
+          },
+        },
+      },
     });
     return result;
   }
 }
 
 const useGroqService = (config: GroqConfig) => {
-    return new GroqService(config)
-}
+  return new GroqService(config);
+};
 
 export { GroqService, useGroqService };
 

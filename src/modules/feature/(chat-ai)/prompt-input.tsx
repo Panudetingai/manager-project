@@ -24,11 +24,17 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AIServiceTypeOption } from "@/modules/ai-service/ai.service";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import {
+  ChatRequestOptions,
+  ChatStatus,
+  FileUIPart,
+  UIDataTypes,
+  UIMessage,
+  UITools,
+} from "ai";
 import { GlobeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useChatStore } from "../store/ai-service/chatStore";
+import { useChatControls } from "../store/ai-service/chatStore";
 import { ModelsType } from "../types/ai-service/ai-service-type";
 
 const models: ModelsType[] = [
@@ -36,59 +42,88 @@ const models: ModelsType[] = [
     id: "claude-3-haiku-20240307",
     name: "Claude 3 Haiku",
     type: "anthropic",
-    modelIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Claude_AI_symbol.svg/2048px-Claude_AI_symbol.svg.png"
+    modelIcon:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Claude_AI_symbol.svg/2048px-Claude_AI_symbol.svg.png",
   },
-  { id: "gemma-3-12b-it", name: "Gemini 1.5 Flash", type: "gemini", modelIcon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW26_bYY4S2PRKRtkug3XVKDIHhpwXhp_oYQ&s" },
+  {
+    id: "gemma-3-12b-it",
+    name: "Gemini 1.5 Flash",
+    type: "gemini",
+    modelIcon:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW26_bYY4S2PRKRtkug3XVKDIHhpwXhp_oYQ&s",
+  },
   {
     id: "deepseek/deepseek-chat-v3.1:free",
     name: "DeepSeek V3.1",
     type: "openrouter",
-    modelIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/DeepSeek-icon.svg/2048px-DeepSeek-icon.svg.png"
+    modelIcon:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/DeepSeek-icon.svg/2048px-DeepSeek-icon.svg.png",
   },
   {
     id: "groq/compound",
     name: "Compound",
     type: "groq",
-    modelIcon: "https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
+    modelIcon:
+      "https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png",
   },
   {
     id: "llama-3.1-8b-instant",
     name: "Llama 3.1 8B",
     type: "groq",
-    modelIcon: "https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
+    modelIcon:
+      "https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png",
   },
   {
     id: "qwen/qwen3-32b",
     name: "Qwen3-32B",
     type: "groq",
-    modelIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Qwen_logo.svg/2048px-Qwen_logo.svg.png"
+    modelIcon:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Qwen_logo.svg/2048px-Qwen_logo.svg.png",
+  },
+  {
+    id: "openai/gpt-oss-120b",
+    name: "GPT OSS 120B",
+    type: "openrouter",
+    modelIcon:
+      "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/chatgpt-icon.png",
   }
 ];
 
+interface PromptInputBoxProps {
+  sendMessage: (
+    message?:
+      | (Omit<UIMessage<unknown, UIDataTypes, UITools>, "id" | "role"> & {
+          id?: string | undefined;
+          role?: "system" | "user" | "assistant" | undefined;
+        } & {
+          text?: never;
+          files?: never;
+          messageId?: string;
+        })
+      | {
+          text: string;
+          files?: FileList | FileUIPart[];
+          metadata?: unknown;
+          parts?: never;
+          messageId?: string;
+        }
+      | {
+          files: FileList | FileUIPart[];
+          metadata?: unknown;
+          parts?: never;
+          messageId?: string;
+        }
+      | undefined,
+    options?: ChatRequestOptions
+  ) => Promise<void>;
+  status: ChatStatus;
+}
 
-const PromptInputBox = () => {
+const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
   const [text, setText] = useState<string>("");
-  const [model, setModel] = useState<ModelsType["id"]>("gemma-3-12b-it");
-  const [modelType, setModelType] = useState<ModelsType["type"]>(
-    "gemini"
-  );
+  const { setModal, modal, modalType, setModalType } = useChatControls();
 
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
-  const { setMessage, setStatus } = useChatStore();
-  const { messages, sendMessage, status, stop } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/ai-service/chat",
-      body: {
-        generatetype: useWebSearch ? "search" : "chat",
-        typeai: modelType,
-        options: {
-          model: model,
-          maxOutputTokens: 1000,
-          temperature: 0.7,
-        },
-      } as AIServiceTypeOption,
-    }),
-  });
 
   const handleSubmit = (message: PromptInputMessage) => {
     // If currently streaming or submitted, stop instead of submitting
@@ -111,32 +146,27 @@ const PromptInputBox = () => {
       },
       {
         body: {
-          typeai: modelType,
+          typeai: modalType,
           options: {
             maxOutputTokens: 1000,
             temperature: 0.7,
-            model: model,
+            model: modal,
           },
           // webSearch: useWebSearch,
         } as AIServiceTypeOption,
       }
-    )
+    );
 
     setText("");
   };
 
   useEffect(() => {
-    setMessage(messages);
-    setStatus(status)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, status]);
-
-  useEffect(() => {
-    const selectedModel = models.find((m) => m.id === model);
+    const selectedModel = models.find((m) => m.id === modal);
     if (selectedModel) {
-      setModelType(selectedModel.type);
+      setModalType(selectedModel.type);
     }
-  }, [model]);
+  // eslint-disable-next-line
+  }, [modal]);
 
   return (
     <div className="flex flex-col justify-end size-full">
@@ -170,16 +200,14 @@ const PromptInputBox = () => {
             </PromptInputButton>
             <PromptInputModelSelect
               defaultValue={models[0].id}
-              value={model}
+              value={modal}
               onValueChange={(value) => {
                 const selectedModel = models.find(
                   (modelOption) => modelOption.id === value
                 );
                 if (selectedModel) {
-                  setModel(() => {
-                    setModelType(selectedModel.type);
-                    return selectedModel.id;
-                  });
+                  setModalType(selectedModel.type);
+                  setModal(selectedModel.id);
                 }
               }}
             >
@@ -193,7 +221,10 @@ const PromptInputBox = () => {
                     value={modelOption.id}
                   >
                     <Avatar className="w-4 h-4">
-                      <AvatarImage src={modelOption.modelIcon} alt={modelOption.name} />
+                      <AvatarImage
+                        src={modelOption.modelIcon}
+                        alt={modelOption.name}
+                      />
                     </Avatar>
                     {modelOption.name}
                   </PromptInputModelSelectItem>

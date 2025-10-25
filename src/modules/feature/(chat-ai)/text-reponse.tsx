@@ -6,10 +6,10 @@ import {
 } from "@/components/ai-elements/message";
 import { Response } from "@/components/ai-elements/response";
 import { useAccountClient } from "@/lib/supabase/getUser-client";
-import { ChatStatus, TextUIPart, UIDataTypes, UIMessage, UITools } from "ai";
+import { TextUIPart, UIDataTypes, UIMessage, UITools } from "ai";
 import { CopyIcon, RefreshCcwIcon, SparklesIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import { useChatStore } from "../store/ai-service/chatStore";
 import { sanitizeText } from "../utils/sanitizeText";
 type Props = {
@@ -18,12 +18,10 @@ type Props = {
   index: number;
   // regenerate: () => void;
   isLastMessage: boolean;
-  status: ChatStatus;
 };
 
-export default function TextResponse({
+function TextResponse({
   message,
-  status,
   partText,
   // regenerate,
   isLastMessage,
@@ -38,15 +36,7 @@ export default function TextResponse({
           } px-3 py-2`}
           variant={message.role === "user" ? "contained" : "flat"}
         >
-          <Response
-            isAnimating={
-              isLastMessage &&
-              message.role === "assistant" &&
-              (status === "submitted" ||
-                status === "streaming" ||
-                status === "ready")
-            }
-          >
+          <Response controls={true} >
             {sanitizeText(partText.text)}
           </Response>
         </MessageContent>
@@ -133,3 +123,5 @@ export const MessageErrorResponse = () => {
     </motion.div>
   )
 }
+
+export default React.memo(TextResponse);
