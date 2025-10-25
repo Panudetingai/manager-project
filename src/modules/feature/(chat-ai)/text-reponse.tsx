@@ -60,17 +60,6 @@ export default function TextResponse({
             src={message.role === "user" ? user.data?.avatar_url ?? "" : ""}
           />
         )}
-        {status === "error" && message.role === "assistant" && (
-          <Response
-            isAnimating={
-              isLastMessage &&
-              message.role === "assistant" &&
-              (status === "error")
-            }
-          >
-            {sanitizeText(partText.text)}
-          </Response>
-        )}
       </Message>
       {message.role === "assistant" && isLastMessage && (
         <Actions>

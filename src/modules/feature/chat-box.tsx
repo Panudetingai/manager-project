@@ -30,9 +30,9 @@ export default function Chatbox() {
         </p>
       </div>
       <div className="relative flex size-full flex-col divide-y overflow-y-auto ">
-        <div className="flex flex-col max-h-[60vh] md:max-h-[70vh] lg:max-h-[75vh] overflow-y-auto">
-          <Conversation>
-            <ConversationContent className="flex flex-col gap-4 min-h-[60vh] max-h-[60vh] md:max-h-[70vh] lg:max-h-[75vh] xl:max-h-[75vh] xl:min-h-[75vh] overflow-y-auto">
+        <div className="flex flex-col">
+          <Conversation  className="relative w-full" style={{ height: '500px' }}>
+            <ConversationContent className="flex flex-col gap-4 min-h-[60vh] max-h-[60vh] md:max-h-[70vh] lg:max-h-[65vh] xl:max-h-[75vh] xl:min-h-[75vh] overflow-y-auto">
               {messages.length === 0 && status !== "submitted" && (
                 <ConversationEmptyState
                   title="No messages yet"
@@ -78,7 +78,7 @@ export default function Chatbox() {
                 {status === "submitted" && <ThinkingMessage key="thinking" />}
               </AnimatePresence>
               <AnimatePresence>
-                {status === "error" && <MessageErrorResponse />}
+                {status === "error" && <MessageErrorResponse key={"messageError"} />}
               </AnimatePresence>
             </ConversationContent>
             <ConversationScrollButton />

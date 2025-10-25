@@ -22,6 +22,7 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AIServiceTypeOption } from "@/modules/ai-service/ai.service";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
@@ -35,13 +36,33 @@ const models: ModelsType[] = [
     id: "claude-3-haiku-20240307",
     name: "Claude 3 Haiku",
     type: "anthropic",
+    modelIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Claude_AI_symbol.svg/2048px-Claude_AI_symbol.svg.png"
   },
-  { id: "gemma-3-12b-it", name: "Gemini 1.5 Flash", type: "gemini" },
+  { id: "gemma-3-12b-it", name: "Gemini 1.5 Flash", type: "gemini", modelIcon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW26_bYY4S2PRKRtkug3XVKDIHhpwXhp_oYQ&s" },
   {
     id: "deepseek/deepseek-chat-v3.1:free",
     name: "DeepSeek V3.1",
     type: "openrouter",
+    modelIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/DeepSeek-icon.svg/2048px-DeepSeek-icon.svg.png"
   },
+  {
+    id: "groq/compound",
+    name: "Compound",
+    type: "groq",
+    modelIcon: "https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
+  },
+  {
+    id: "llama-3.1-8b-instant",
+    name: "Llama 3.1 8B",
+    type: "groq",
+    modelIcon: "https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
+  },
+  {
+    id: "qwen/qwen3-32b",
+    name: "Qwen3-32B",
+    type: "groq",
+    modelIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Qwen_logo.svg/2048px-Qwen_logo.svg.png"
+  }
 ];
 
 
@@ -53,8 +74,8 @@ const PromptInputBox = () => {
   );
 
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
-  const { setMessage, setStatus, seterror } = useChatStore();
-  const { messages, sendMessage, status, stop, error } = useChat({
+  const { setMessage, setStatus } = useChatStore();
+  const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/ai-service/chat",
       body: {
@@ -90,11 +111,16 @@ const PromptInputBox = () => {
       },
       {
         body: {
-          model: model,
-          webSearch: useWebSearch,
-        },
+          typeai: modelType,
+          options: {
+            maxOutputTokens: 1000,
+            temperature: 0.7,
+            model: model,
+          },
+          // webSearch: useWebSearch,
+        } as AIServiceTypeOption,
       }
-    );
+    )
 
     setText("");
   };
@@ -111,10 +137,6 @@ const PromptInputBox = () => {
       setModelType(selectedModel.type);
     }
   }, [model]);
-
-  if (error) {
-    seterror(error)
-  }
 
   return (
     <div className="flex flex-col justify-end size-full">
@@ -170,13 +192,16 @@ const PromptInputBox = () => {
                     key={modelOption.id}
                     value={modelOption.id}
                   >
+                    <Avatar className="w-4 h-4">
+                      <AvatarImage src={modelOption.modelIcon} alt={modelOption.name} />
+                    </Avatar>
                     {modelOption.name}
                   </PromptInputModelSelectItem>
                 ))}
               </PromptInputModelSelectContent>
             </PromptInputModelSelect>
           </PromptInputTools>
-          <PromptInputSubmit className="!h-8" status={status} />
+          <PromptInputSubmit className="!h-8 rounded-full" status={status} />
         </PromptInputFooter>
       </PromptInput>
     </div>
