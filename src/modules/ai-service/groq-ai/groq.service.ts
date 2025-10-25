@@ -11,7 +11,6 @@ interface OptionParameter {
   option: Parameters<typeof streamText>[0];
   messages: UIMessage[];
 }
-
 class GroqService {
   private apiurl = "https://api.groq.com/openai/v1" as string;
   private apikey = process.env.GROQ_API_KEY as string;
@@ -47,24 +46,35 @@ class GroqService {
         },
         {
           role: "user",
-          content: paramater.messages
-            .filter((msg) => msg.role === "user")
-            .map((msg) => msg.parts.find((part) => part.type === "text")?.text)
-            .filter((text): text is string => text !== undefined)
-            .join("\n"),
+
+          content: [
+            {
+              type: "text",
+              text: paramater.messages
+                .filter((msg) => msg.role === "user")
+                .map(
+                  (msg) => msg.parts.find((part) => part.type === "text")?.text
+                )
+                .filter((text): text is string => text !== undefined)
+                .join("\n"),
+            },
+            ...paramater.messages
+              .filter((msg) => msg.role === "user")
+              .flatMap((msg) =>
+                msg.parts
+                  .filter((part) => part.type === "file")
+                  .map((part) => ({
+                    type: "image" as const,
+                    image: part.url,
+                  }))
+              ),
+          ],
         },
       ],
-      providerOptions: {
-        groq: {
-          parallelToolCalls: true, // Enable parallel function calling (default: true)
-          compound_custom: {
-            tools: {
-              enabled_tools: ["web_search"],
-            },
-          },
-        },
-      },
     });
+
+    console.log(result.fullStream);
+
     return result;
   }
 }

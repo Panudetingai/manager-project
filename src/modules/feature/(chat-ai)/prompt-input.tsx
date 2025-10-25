@@ -9,7 +9,6 @@ import {
   PromptInputAttachment,
   PromptInputAttachments,
   PromptInputBody,
-  PromptInputButton,
   PromptInputFooter,
   type PromptInputMessage,
   PromptInputModelSelect,
@@ -32,7 +31,6 @@ import {
   UIMessage,
   UITools,
 } from "ai";
-import { GlobeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useChatControls } from "../store/ai-service/chatStore";
 import { ModelsType } from "../types/ai-service/ai-service-type";
@@ -81,12 +79,19 @@ const models: ModelsType[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Qwen_logo.svg/2048px-Qwen_logo.svg.png",
   },
   {
+    id: "meta-llama/llama-4-maverick-17b-128e-instruct",
+    name: "Llama 4 Maverick 17B",
+    type: "groq",
+    modelIcon:
+      "https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png",
+  },
+  {
     id: "openai/gpt-oss-120b",
     name: "GPT OSS 120B",
-    type: "openrouter",
+    type: "groq",
     modelIcon:
       "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/chatgpt-icon.png",
-  }
+  },
 ];
 
 interface PromptInputBoxProps {
@@ -103,13 +108,13 @@ interface PromptInputBoxProps {
       | {
           text: string;
           files?: FileList | FileUIPart[];
-          metadata?: unknown;
+          metadata?: undefined;
           parts?: never;
           messageId?: string;
         }
       | {
           files: FileList | FileUIPart[];
-          metadata?: unknown;
+          metadata?: undefined;
           parts?: never;
           messageId?: string;
         }
@@ -122,9 +127,7 @@ interface PromptInputBoxProps {
 const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
   const [text, setText] = useState<string>("");
   const { setModal, modal, modalType, setModalType } = useChatControls();
-
-  const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
-
+  
   const handleSubmit = (message: PromptInputMessage) => {
     // If currently streaming or submitted, stop instead of submitting
     if (status === "streaming" || status === "submitted") {
@@ -165,7 +168,7 @@ const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
     if (selectedModel) {
       setModalType(selectedModel.type);
     }
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [modal]);
 
   return (
@@ -191,13 +194,6 @@ const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
               </PromptInputActionMenuContent>
             </PromptInputActionMenu>
             <PromptInputSpeechButton onTranscriptionChange={setText} />
-            <PromptInputButton
-              onClick={() => setUseWebSearch(!useWebSearch)}
-              variant={useWebSearch ? "default" : "ghost"}
-            >
-              <GlobeIcon size={16} />
-              <span>Search</span>
-            </PromptInputButton>
             <PromptInputModelSelect
               defaultValue={models[0].id}
               value={modal}
@@ -215,20 +211,26 @@ const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
                 <PromptInputModelSelectValue />
               </PromptInputModelSelectTrigger>
               <PromptInputModelSelectContent>
-                {models.map((modelOption) => (
-                  <PromptInputModelSelectItem
-                    key={modelOption.id}
-                    value={modelOption.id}
-                  >
-                    <Avatar className="w-4 h-4">
-                      <AvatarImage
-                        src={modelOption.modelIcon}
-                        alt={modelOption.name}
-                      />
-                    </Avatar>
-                    {modelOption.name}
-                  </PromptInputModelSelectItem>
-                ))}
+                {models
+                  .sort((a, b) => {
+                    if (a.type === modalType && b.type !== modalType) return -1;
+                    if (a.type !== modalType && b.type === modalType) return 1;
+                    return a.name.localeCompare(b.name);
+                  })
+                  .map((modelOption) => (
+                    <PromptInputModelSelectItem
+                      key={modelOption.id}
+                      value={modelOption.id}
+                    >
+                      <Avatar className="w-4 h-4">
+                        <AvatarImage
+                          src={modelOption.modelIcon}
+                          alt={modelOption.name}
+                        />
+                      </Avatar>
+                      {modelOption.name}
+                    </PromptInputModelSelectItem>
+                  ))}
               </PromptInputModelSelectContent>
             </PromptInputModelSelect>
           </PromptInputTools>

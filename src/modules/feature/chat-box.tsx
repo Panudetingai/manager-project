@@ -16,13 +16,13 @@ import { AnimatePresence } from "motion/react";
 import React, { Fragment, useEffect } from "react";
 import { AIServiceTypeOption } from "../ai-service/ai.service";
 import ChatEmpty from "./(chat-ai)/chat-empty";
+import ImagePreview from "./(chat-ai)/image-input";
 import PromptInputBox from "./(chat-ai)/prompt-input";
 import TextResponse, {
   MessageErrorResponse,
   ThinkingMessage,
 } from "./(chat-ai)/text-reponse";
 import { useChatControls } from "./store/ai-service/chatStore";
-
 function Chatbox() {
   const { modal, modalType, webSearch } = useChatControls();
   const reasoningRef = React.useRef<HTMLDivElement>(null);
@@ -78,6 +78,14 @@ function Chatbox() {
                             message={message}
                             partText={part}
                             isLastMessage={isLastMessage}
+                          />
+                        );
+                      case "file":
+                        return (
+                          <ImagePreview
+                            i={`${message.id}-${i}`}
+                            message={message}
+                            part={part}
                           />
                         );
                       case "reasoning":
