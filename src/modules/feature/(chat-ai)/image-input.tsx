@@ -13,7 +13,6 @@ interface ImagePreviewProps {
 
 export default function ImagePreview({ i, message, part }: ImagePreviewProps) {
   const [preview, setPreview] = useState(false);
-
   return (
     <>
       <Message key={`${message.id}-${i}`} from={message.role}>

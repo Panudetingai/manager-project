@@ -1,15 +1,11 @@
-import { GroqModelId } from "@/modules/feature/types/ai-service/ai-service-type";
+import { GroqModelId, OptionParameter } from "@/modules/feature/types/ai-service/ai-service-type";
 import { createGroq } from "@ai-sdk/groq";
-import { streamText, UIMessage } from "ai";
+import { streamText } from "ai";
+import { createConversation } from "../server/api";
 
 interface GroqConfig {
   apiurl?: string;
   apikey: string;
-}
-
-interface OptionParameter {
-  option: Parameters<typeof streamText>[0];
-  messages: UIMessage[];
 }
 class GroqService {
   private apiurl = "https://api.groq.com/openai/v1" as string;
@@ -35,7 +31,7 @@ class GroqService {
     return client;
   }
 
-  public generateText({ paramater }: { paramater: OptionParameter }) {
+  public async generateText({ paramater }: { paramater: OptionParameter }) {
     const client = this.createGrop();
     const result = streamText({
       model: client(paramater.option.model as GroqModelId),
@@ -73,7 +69,26 @@ class GroqService {
       ],
     });
 
-    console.log(result.fullStream);
+    console.log(JSON.stringify(paramater, null, 2))
+
+    await createConversation({
+      payload: {
+        id: paramater.generateId,
+        message_id: paramater.message_id,
+        messages: JSON.parse(
+          JSON.stringify([
+            ...paramater.messages,
+            (await result.response).messages,
+          ])
+        ),
+        title:
+          paramater.messages[0]?.parts[0]?.type === "text"
+            ? paramater.messages[0]?.parts[0]?.text.slice(0, 20)
+            : "New Conversation",
+        user_id: paramater.userid,
+        vector: null,
+      },
+    });
 
     return result;
   }
