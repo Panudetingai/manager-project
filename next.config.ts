@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
  },
  devIndicators: false,
  experimental: {
-    turbopackFileSystemCacheForDev: true,
+    turbopackFileSystemCacheForDev: false,
  }
 };
 

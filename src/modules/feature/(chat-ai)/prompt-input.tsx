@@ -22,7 +22,6 @@ import {
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { useUserClient } from "@/lib/supabase/getUser-client";
 import { AIServiceTypeOption } from "@/modules/ai-service/ai.service";
 import {
   ChatRequestOptions,
@@ -32,7 +31,6 @@ import {
   UIMessage,
   UITools,
 } from "ai";
-import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useChatControls } from "../store/ai-service/chatStore";
 import { ModelsType } from "../types/ai-service/ai-service-type";
@@ -125,18 +123,21 @@ interface PromptInputBoxProps {
     chatId?: string
   ) => Promise<void>;
   status: ChatStatus;
+  setgenerateId: (id: string) => void;
+  generateId: string;
 }
 
-const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
+const PromptInputBox = ({
+  sendMessage,
+  status,
+  setgenerateId,
+  generateId,
+}: PromptInputBoxProps) => {
   const [text, setText] = useState<string>("");
   const { setModal, modal, modalType, setModalType } = useChatControls();
-  const [GenerateId, setGenerateId] = useState<string>();
-  
-  const data = useUserClient();
-  const { id } = useParams();
 
   const pathChat = crypto.randomUUID();
-  const parameterChatId = GenerateId || id || pathChat as string;
+  const parameterChatId = generateId || (pathChat as string);
 
   const handleSubmit = async (message: PromptInputMessage) => {
     // If currently streaming or submitted, stop instead of submitting
@@ -152,6 +153,8 @@ const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
       return;
     }
 
+    setgenerateId(parameterChatId as string);
+
     sendMessage(
       {
         text: message.text || "Sent with attachments",
@@ -159,8 +162,6 @@ const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
       },
       {
         body: {
-          generateId: parameterChatId,
-          userid: data?.data?.id,
           typeai: modalType,
           generatetype: "chat",
           options: {
@@ -171,12 +172,12 @@ const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
         } as AIServiceTypeOption,
       }
     );
+
     window.history.replaceState(
       {},
       "",
       `/dashboard/project/ai-chat/${parameterChatId}`
     );
-    setGenerateId(parameterChatId as string);
     setText("");
   };
 

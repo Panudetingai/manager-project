@@ -21,8 +21,6 @@ export type ModelsType = {
 export interface OptionParameter {
   id: string;
   message_id: string;
-  userid: string;
-  generateId: string;
   option: Parameters<typeof streamText>[0];
   messages: UIMessage[];
 }
