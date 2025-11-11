@@ -27,7 +27,7 @@ import TextResponse, {
 import { useChatControls } from "./store/ai-service/chatStore";
 
 interface ChatBoxProps {
-  params: {
+  params?: {
     id: Promise<string>;
   };
 }
@@ -39,9 +39,9 @@ function ChatBox({ params }: ChatBoxProps) {
   const { mutate: saveConversation } =
     useConversationAPI.useSaveConversationAPI();
   const generateIdRef = React.useRef<string>("");
-  const getConversation = useConversationAPI.useGetConversationByIdAPI(
-    params.id
-  );
+    const getConversation = useConversationAPI.useGetConversationByIdAPI(
+      params?.id || generateId
+    );
   const { messages, setMessages, sendMessage, status } = useChat({
     experimental_throttle: 100,
     transport: new DefaultChatTransport({
