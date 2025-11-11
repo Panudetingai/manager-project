@@ -1,7 +1,9 @@
-import { GroqModelId, OptionParameter } from "@/modules/feature/types/ai-service/ai-service-type";
+import {
+  GroqModelId,
+  OptionParameter,
+} from "@/modules/feature/types/ai-service/ai-service-type";
 import { createGroq } from "@ai-sdk/groq";
 import { streamText } from "ai";
-import { createConversation } from "../server/api";
 
 interface GroqConfig {
   apiurl?: string;
@@ -67,26 +69,13 @@ class GroqService {
           ],
         },
       ],
-    });
-
-    console.log(JSON.stringify(paramater, null, 2))
-
-    await createConversation({
-      payload: {
-        id: paramater.generateId,
-        message_id: paramater.message_id,
-        messages: JSON.parse(
-          JSON.stringify([
-            ...paramater.messages,
-            (await result.response).messages,
-          ])
-        ),
-        title:
-          paramater.messages[0]?.parts[0]?.type === "text"
-            ? paramater.messages[0]?.parts[0]?.text.slice(0, 20)
-            : "New Conversation",
-        user_id: paramater.userid,
-        vector: null,
+      providerOptions: {
+        groq: {
+          reasoningFormat: "parsed",
+          reasoningEffort: "default",
+          parallelToolCalls: true,
+          structuredOutputs: false
+        },
       },
     });
 

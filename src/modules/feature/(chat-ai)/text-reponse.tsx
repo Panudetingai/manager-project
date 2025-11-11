@@ -1,11 +1,9 @@
 import { Action, Actions } from "@/components/ai-elements/actions";
 import {
   Message,
-  MessageAvatar,
   MessageContent,
+  MessageResponse,
 } from "@/components/ai-elements/message";
-import { Response } from "@/components/ai-elements/response";
-import { useAccountClient } from "@/lib/supabase/getUser-client";
 import { TextUIPart, UIDataTypes, UIMessage, UITools } from "ai";
 import { CopyIcon, RefreshCcwIcon, SparklesIcon } from "lucide-react";
 import { motion } from "motion/react";
@@ -26,30 +24,18 @@ function TextResponse({
   // regenerate,
   isLastMessage,
 }: Props) {
-  const user = useAccountClient();
   return (
     <Fragment>
       <Message from={message.role}>
         <MessageContent
-          className={`${
-            message.role === "user" ? "rounded-full" : ""
-          } px-3 py-2`}
-          variant={message.role === "user" ? "contained" : "flat"}
+          className={
+            message.role === "user" ? "!bg-primary !px-3 !py-2 !rounded-full !text-muted" : ""
+          }
         >
-          <Response controls={true} >
+          <MessageResponse controls={true} skipHtml={true} >
             {sanitizeText(partText.text)}
-          </Response>
+          </MessageResponse>
         </MessageContent>
-        {message.role === "user" && (
-          <MessageAvatar
-            name={
-              message.role === "user"
-                ? user.data?.username ?? "User"
-                : "ChatServiceAI"
-            }
-            src={message.role === "user" ? user.data?.avatar_url ?? "" : ""}
-          />
-        )}
       </Message>
       {message.role === "assistant" && isLastMessage && (
         <Actions>

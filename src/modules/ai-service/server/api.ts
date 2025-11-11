@@ -1,5 +1,4 @@
 "use server";
-
 import { Database } from "../../../../utils/supabase/database.types";
 import { createClient } from "../../../../utils/supabase/server";
 
@@ -16,7 +15,8 @@ export async function createConversation({ payload }: Conversation) {
     ...payload,
   });
 
-  if (error) throw error;
+  console.log("conversions save function db", error)
+  if (error) return error;
 
   return data;
 }

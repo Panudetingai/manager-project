@@ -37,12 +37,16 @@ export function AppBreadcrumb() {
     .filter(Boolean)
     .filter((s) => decodeURIComponent(s).toLowerCase() !== "dashboard");
 
-  const segments = rawSegments.map((seg, idx) => {
-    const href = "/" + rawSegments.slice(0, idx + 1).join("/");
+  const last = rawSegments[rawSegments.length - 1];
+  const isId = /^[0-9a-fA-F\-]{16,}$/.test(last) || /^\d+$/.test(last);
+  const segments = isId ? rawSegments.slice(0, -1) : rawSegments;
+
+  const breadcrumbSegments = segments.map((seg, idx) => {
+    const href = "/" + segments.slice(0, idx + 1).join("/");
     return { seg, href, label: formatSegment(seg) };
   });
 
-  const items = [{ seg: "", href: "/", label: "Home" }, ...segments];
+  const items = [{ seg: "", href: "/", label: "Home" }, ...breadcrumbSegments];
 
   const maxVisible = 4;
   const shouldCollapse = items.length > maxVisible;
@@ -54,7 +58,7 @@ export function AppBreadcrumb() {
           <>
             {/* Home */}
             <BreadcrumbItem>
-              <Link href={{pathname: items[0].href}} passHref legacyBehavior>
+              <Link href={{ pathname: items[0].href }} passHref legacyBehavior>
                 <BreadcrumbLink asChild>
                   <a>{items[0].label}</a>
                 </BreadcrumbLink>
@@ -63,7 +67,7 @@ export function AppBreadcrumb() {
             <BreadcrumbSeparator />
             {/* First real segment */}
             <BreadcrumbItem>
-              <Link href={{pathname: items[1].href}} passHref legacyBehavior>
+              <Link href={{ pathname: items[1].href }} passHref legacyBehavior>
                 <BreadcrumbLink asChild>
                   <a>{items[1].label}</a>
                 </BreadcrumbLink>
@@ -85,7 +89,11 @@ export function AppBreadcrumb() {
                 <DropdownMenuContent align="start">
                   {items.slice(2, items.length - 1).map((it) => (
                     <div key={it.href} className="px-2 py-1">
-                      <Link href={{pathname: it.href}} passHref legacyBehavior>
+                      <Link
+                        href={{ pathname: it.href }}
+                        passHref
+                        legacyBehavior
+                      >
                         <a className="block w-full text-sm">{it.label}</a>
                       </Link>
                     </div>
