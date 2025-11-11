@@ -8,6 +8,9 @@ import { OpenRouterService } from "./openroute-ai/openrouter.service";
 type AIServiceTypeParameters = Parameters<typeof streamText>[0];
 
 export type AIServiceTypeOption = {
+  generateId: string;
+  id: string;
+  userid: string;
   typeai: ModelsType["type"];
   generatetype: "chat" | "think" | "search";
   options: AIServiceTypeParameters;

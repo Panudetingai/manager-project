@@ -22,6 +22,7 @@ import {
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useUserClient } from "@/lib/supabase/getUser-client";
 import { AIServiceTypeOption } from "@/modules/ai-service/ai.service";
 import {
   ChatRequestOptions,
@@ -31,6 +32,7 @@ import {
   UIMessage,
   UITools,
 } from "ai";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useChatControls } from "../store/ai-service/chatStore";
 import { ModelsType } from "../types/ai-service/ai-service-type";
@@ -119,7 +121,8 @@ interface PromptInputBoxProps {
           messageId?: string;
         }
       | undefined,
-    options?: ChatRequestOptions
+    options?: ChatRequestOptions,
+    chatId?: string
   ) => Promise<void>;
   status: ChatStatus;
 }
@@ -127,8 +130,15 @@ interface PromptInputBoxProps {
 const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
   const [text, setText] = useState<string>("");
   const { setModal, modal, modalType, setModalType } = useChatControls();
+  const [GenerateId, setGenerateId] = useState<string>();
   
-  const handleSubmit = (message: PromptInputMessage) => {
+  const data = useUserClient();
+  const { id } = useParams();
+
+  const pathChat = crypto.randomUUID();
+  const parameterChatId = GenerateId || id || pathChat as string;
+
+  const handleSubmit = async (message: PromptInputMessage) => {
     // If currently streaming or submitted, stop instead of submitting
     if (status === "streaming" || status === "submitted") {
       stop();
@@ -149,17 +159,24 @@ const PromptInputBox = ({ sendMessage, status }: PromptInputBoxProps) => {
       },
       {
         body: {
+          generateId: parameterChatId,
+          userid: data?.data?.id,
           typeai: modalType,
+          generatetype: "chat",
           options: {
+            model: modal,
             maxOutputTokens: 1000,
             temperature: 0.7,
-            model: modal,
           },
-          // webSearch: useWebSearch,
         } as AIServiceTypeOption,
       }
     );
-
+    window.history.replaceState(
+      {},
+      "",
+      `/dashboard/project/ai-chat/${parameterChatId}`
+    );
+    setGenerateId(parameterChatId as string);
     setText("");
   };
 

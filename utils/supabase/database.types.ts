@@ -44,6 +44,41 @@ export type Database = {
         }
         Relationships: []
       }
+      conversations: {
+        Row: {
+          id: string
+          message_id: string
+          messages: Json | null
+          title: string
+          user_id: string | null
+          vector: string | null
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          messages?: Json | null
+          title: string
+          user_id?: string | null
+          vector?: string | null
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          messages?: Json | null
+          title?: string
+          user_id?: string | null
+          vector?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding: {
         Row: {
           created_at: string
@@ -231,6 +266,7 @@ export type Database = {
         Row: {
           created_at: string
           expired_at: string
+          id: string
           invited_by: string
           updated_at: string | null
           user_owner_id: string
@@ -242,6 +278,7 @@ export type Database = {
         Insert: {
           created_at?: string
           expired_at?: string
+          id?: string
           invited_by?: string
           updated_at?: string | null
           user_owner_id?: string
@@ -253,6 +290,7 @@ export type Database = {
         Update: {
           created_at?: string
           expired_at?: string
+          id?: string
           invited_by?: string
           updated_at?: string | null
           user_owner_id?: string
@@ -279,7 +317,7 @@ export type Database = {
           {
             foreignKeyName: "workspace_invite_workspace_owner_id_fkey"
             columns: ["workspace_owner_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "workspace"
             referencedColumns: ["id"]
           },
@@ -288,6 +326,7 @@ export type Database = {
       workspace_member: {
         Row: {
           created_at: string
+          id: string
           invited_by: string | null
           joined_at: string | null
           role: Database["public"]["Enums"]["workspace_role"] | null
@@ -296,6 +335,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          id?: string
           invited_by?: string | null
           joined_at?: string | null
           role?: Database["public"]["Enums"]["workspace_role"] | null
@@ -304,6 +344,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          id?: string
           invited_by?: string | null
           joined_at?: string | null
           role?: Database["public"]["Enums"]["workspace_role"] | null
@@ -328,7 +369,7 @@ export type Database = {
           {
             foreignKeyName: "workspace_member_workspace_owner_id_fkey"
             columns: ["workspace_owner_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "workspace"
             referencedColumns: ["id"]
           },

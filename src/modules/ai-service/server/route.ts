@@ -7,10 +7,13 @@ type GenerateChatTypes = "chat" | "think" | "search";
 export const maxDuration = 30;
 
 const AIServiceAPI = new Elysia().post("/chat", async (req) => {
-  const { typeai, options, messages, generatetype } =
+  const { typeai, options, messages, generatetype, generateId, id, userid } =
     req.body as AIServiceTypeOption;
 
   const response = useAIService({
+    id: id,
+    generateId: generateId,
+    userid: userid,
     typeai: typeai,
     options: options,
     generatetype: generatetype,
@@ -19,16 +22,20 @@ const AIServiceAPI = new Elysia().post("/chat", async (req) => {
 
   if (!response) throw new Error("AI Service not found");
 
+  console.log("route Id", generateId);
 
   switch (generatetype as GenerateChatTypes) {
     case "chat":
       const result = (await response.generateText({
         paramater: {
+          id: id,
+          generateId: generateId,
+          userid: userid,
+          message_id: id,
           option: options,
           messages,
         },
       })) as StreamTextResult<ToolSet, never>;
-      console.log(JSON.stringify(result, null, 2));
       return result.toUIMessageStreamResponse({
         sendReasoning: true,
         messageMetadata: ({ part }) => {
@@ -42,7 +49,7 @@ const AIServiceAPI = new Elysia().post("/chat", async (req) => {
             return {
               toolName: part.toolName,
               toolCallId: part.toolCallId,
-            }
+            };
           }
         },
       });
