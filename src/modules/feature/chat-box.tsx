@@ -15,7 +15,7 @@ import { DefaultChatTransport } from "ai";
 import { AnimatePresence } from "motion/react";
 import React, { Fragment, useEffect, useState } from "react";
 import { AIServiceTypeOption } from "../ai-service/ai.service";
-import { useConversationAPI } from "../ai-service/server/action/action";
+import { useConversationAPI } from "../ai-service/hooks/action";
 import ChatEmpty from "./(chat-ai)/chat-empty";
 import ChatboxLoading from "./(chat-ai)/chatbox-loading";
 import ImagePreview from "./(chat-ai)/image-input";
