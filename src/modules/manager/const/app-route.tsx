@@ -1,4 +1,4 @@
-import { CirclePlus, CreditCard, LayoutDashboard, LucideIcon, Settings2, SparkleIcon, Users2, UsersRound } from "lucide-react";
+import { CirclePlus, CreditCard, Facebook, Instagram, LayoutDashboard, LucideIcon, Settings2, SettingsIcon, SparkleIcon, SquareM, Users2, UsersRound } from "lucide-react";
 import z from "zod";
 import pathsConfig from "../../../../config/app.router";
 import { Database } from "../../../../utils/supabase/database.types";
@@ -94,15 +94,31 @@ export const APP_ROUTE: AppRoute[] = [
     ]
   },
   {
-    labelgroup: "Management",
+    labelgroup: "Settings",
     role: ["owner", "admin"],
     items: [
       {
-        label: "Personal Settings",
-        path: pathsConfig.app.workspaceSettingsGeneral,
-        icon: Settings2,
-        role: ["owner", "admin"],
-        submenu: [],
+        label: "Social Accounts",
+        path: "",
+        icon: SettingsIcon,
+        role: ["owner", "admin", "user"],
+        submenu: [
+          {
+            label: "LINE API",
+            icon: SquareM,
+            path: pathsConfig.setting.workspaceSettingsSocialAccountsLineAPI,
+          },
+          {
+            label: "Facebook API",
+            icon: Facebook,
+            path: pathsConfig.setting.workspaceSettingsSocialAccountsFacebook,
+          },
+          {
+            label: "Instagram API",
+            icon: Instagram,
+            path: pathsConfig.setting.workspaceSettingsSocialAccountsInstagram,
+          }
+        ],
       }
     ],
   }

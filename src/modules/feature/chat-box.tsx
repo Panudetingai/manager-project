@@ -38,10 +38,14 @@ function ChatBox({ params }: ChatBoxProps) {
   const reasoningRef = React.useRef<HTMLDivElement>(null);
   const { mutate: saveConversation } =
     useConversationAPI.useSaveConversationAPI();
+
   const generateIdRef = React.useRef<string>("");
-    const getConversation = useConversationAPI.useGetConversationByIdAPI(
-      params?.id || generateId
-    );
+  let getConversation: ReturnType<typeof useConversationAPI.useGetConversationByIdAPI> | null =
+    null;
+  if (params?.id) {
+    getConversation = useConversationAPI.useGetConversationByIdAPI(params?.id || generateId);
+  }
+
   const { messages, setMessages, sendMessage, status } = useChat({
     experimental_throttle: 100,
     transport: new DefaultChatTransport({
@@ -85,14 +89,15 @@ function ChatBox({ params }: ChatBoxProps) {
   }, []);
 
   useEffect(() => {
+    if (!getConversation) return;
     if (getConversation.data?.messages) {
       // eslint-disable-next-line
       setMessages(getConversation.data.messages as any);
     }
     // eslint-disable-next-line
-  }, [params?.id, getConversation.data?.messages]);
+  }, [params?.id, getConversation?.data?.messages]);
 
-  if (getConversation.isPending) {
+  if (params?.id && getConversation?.isPending) {
     return <ChatboxLoading />;
   }
 

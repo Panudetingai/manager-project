@@ -50,20 +50,11 @@ export function AppSidebar({role}: {role: Database["public"]["Enums"]["user_role
                   <SidebarMenu>
                     <Collapsible className="group/collapsible">
                       {item.items
-                        .filter((i) => !i.role || i.role.includes(role)) // filter menu ตาม role
+                        .filter((i) => !i.role || i.role.includes(role))
                         .map((i) => (
                           <SidebarMenuItem key={i.path}>
                             {i.submenu && i.submenu.length > 0 ? (
                               <CollapsibleTrigger className="w-full" asChild>
-                                <Link
-                                  href={{
-                                    pathname: i.path.replace(
-                                      "[workspace]",
-                                      workspaceName.toString()
-                                    ),
-                                  }}
-                                  passHref
-                                >
                                   <SidebarMenuButton
                                     className="cursor-pointer"
                                     tooltip={i.label}
@@ -76,7 +67,6 @@ export function AppSidebar({role}: {role: Database["public"]["Enums"]["user_role
                                     {i.label}
                                     <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
                                   </SidebarMenuButton>
-                                </Link>
                               </CollapsibleTrigger>
                             ) : (
                               <Link

@@ -71,9 +71,6 @@ class GroqService {
       ],
       providerOptions: {
         groq: {
-          reasoningFormat: "parsed",
-          reasoningEffort: "default",
-          parallelToolCalls: true,
           structuredOutputs: false
         },
       },

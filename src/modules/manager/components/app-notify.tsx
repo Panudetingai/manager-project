@@ -70,7 +70,9 @@ export default function AppNotify() {
         <Button variant="ghost" size="icon">
           <div className="relative">
             <Bell />
-            <div className="absolute w-2 h-2 bg-primary rounded-full -top-0.5 right-0" />
+            {notifications.length > 0 && (
+              <div className="absolute w-2 h-2 bg-primary rounded-full -top-0.5 right-0" />
+            )}
           </div>
         </Button>
       </PopoverTrigger>

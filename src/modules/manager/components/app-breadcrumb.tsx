@@ -58,18 +58,18 @@ export function AppBreadcrumb() {
           <>
             {/* Home */}
             <BreadcrumbItem>
-              <Link href={{ pathname: items[0].href }} passHref legacyBehavior>
+              <Link href={{ pathname: items[0].href }} passHref>
                 <BreadcrumbLink asChild>
-                  <a>{items[0].label}</a>
+                  <p>{items[0].label}</p>
                 </BreadcrumbLink>
               </Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             {/* First real segment */}
             <BreadcrumbItem>
-              <Link href={{ pathname: items[1].href }} passHref legacyBehavior>
+              <Link href={{ pathname: items[1].href }} passHref>
                 <BreadcrumbLink asChild>
-                  <a>{items[1].label}</a>
+                  <p>{items[1].label}</p>
                 </BreadcrumbLink>
               </Link>
             </BreadcrumbItem>
@@ -92,9 +92,8 @@ export function AppBreadcrumb() {
                       <Link
                         href={{ pathname: it.href }}
                         passHref
-                        legacyBehavior
                       >
-                        <a className="block w-full text-sm">{it.label}</a>
+                        <p className="block w-full text-sm">{it.label}</p>
                       </Link>
                     </div>
                   ))}
@@ -118,7 +117,7 @@ export function AppBreadcrumb() {
                     <BreadcrumbPage>{it.label}</BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
-                      <a>{it.label}</a>
+                      <p>{it.label}</p>
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>

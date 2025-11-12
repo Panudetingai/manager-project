@@ -25,6 +25,11 @@ const PathsSchema = z.object({
   }),
   join: z.object({
     menubarjoin: z.string().min(1),
+  }),
+  setting: z.object({
+    workspaceSettingsSocialAccountsInstagram: z.string().min(1),
+    workspaceSettingsSocialAccountsFacebook: z.string().min(1),
+    workspaceSettingsSocialAccountsLineAPI: z.string().min(1),
   })
 });
 
@@ -53,6 +58,11 @@ const pathsConfig = PathsSchema.parse({
   },
   feature: {
     aichat: "/dashboard/[workspace]/ai-chat",
+  },
+  setting: {
+    workspaceSettingsSocialAccountsLineAPI: "/dashboard/[workspace]/settings/social-accounts/line",
+    workspaceSettingsSocialAccountsFacebook: "/dashboard/[workspace]/settings/social-accounts/facebook",
+    workspaceSettingsSocialAccountsInstagram: "/dashboard/[workspace]/settings/social-accounts/instagram",
   }
 } satisfies z.infer<typeof PathsSchema>);
 
