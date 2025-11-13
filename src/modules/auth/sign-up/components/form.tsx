@@ -18,10 +18,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useUserClient } from "@/lib/supabase/getUser-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Mail } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { APIAuthService } from "../../server/api";
 import { formSchemaSignUp, FormSchemaSignUp } from "../schema/form";
@@ -31,6 +32,8 @@ export default function FormSignUp() {
   const [isLoading, setisLoading] = useState(false);
   const [mail, setmail] = useState<string>("");
   const [verification, setVerification] = useState(false);
+  const user = useUserClient();
+
   const form = useForm<FormSchemaSignUp>({
     resolver: zodResolver(formSchemaSignUp),
     defaultValues: {
@@ -55,6 +58,10 @@ export default function FormSignUp() {
     });
   };
 
+  useEffect(() => {
+    setisLoading(true);
+  }, [user.data?.id]);
+
   if (verification) {
     return (
       <Card className="w-1/3 max-sm:w-2xl">
@@ -78,7 +85,7 @@ export default function FormSignUp() {
                 setVerification(false);
               }}
             >
-              Back to Sign In
+              {isLoading ? (<Loader2 size={24} className="animate-spin" />) : "Back to Sign In"}
             </Button>
           </Link>
         </CardFooter>

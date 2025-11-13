@@ -9,39 +9,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { createClient } from "../../../../../utils/supabase/client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { useUserVerify } from "../hooks/userverify";
 
 export function VerifyEmailCard() {
+  const { mutate: Callback } = useUserVerify();
   const searchParams = useSearchParams();
-  const code = searchParams.get("code");
-
+  const code = searchParams.get("code") as string;
   useEffect(() => {
-    const verifyEmail = async () => {
-      if (code) {
-        const supabase = createClient();
-        const { data, error } = await supabase.auth.exchangeCodeForSession(
-          code
-        );
-        if (!data.session) return console.error("No session data", error);
-
-        const { error: accountError } = await supabase.from("account").upsert([
-          {
-            id: data.session.user.id,
-            email: data.session.user.email,
-            username: data.session.user.user_metadata.full_name,
-            avatar_url: data.session.user.user_metadata.avatar_url,
-            updated_at: new Date().toISOString(),
-          },
-        ]);
-        if (accountError) throw new Error(accountError.message);
-      }
-    };
-    verifyEmail();
-  }, [code]);
+    Callback(code);
+  }, [code, Callback]);
 
   return (
     <Card className="w-1/3 max-sm:w-2xl">

@@ -58,14 +58,21 @@ export function SidebarAccount() {
           <SidebarMenuButton className="py-6" size={"lg"}>
             <Image
               className="rounded-sm"
-              src={user && user.user_metadata.avatar_url}
+              src={
+                (user && user.user_metadata.avatar_url) ||
+                "https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671116.jpg"
+              }
               alt="User Avatar"
               width={32}
               height={32}
             />
             <div className="flex flex-col">
               <p className="font-medium">
-                {user && user.user_metadata.full_name}
+                {(user && user.user_metadata.full_name) ||
+                  (user &&
+                  user.user_metadata.email.substring(
+                    user.user_metadata.email.indexOf("@") + 1
+                  ))}
               </p>
               <span className="text-xs text-muted-foreground">
                 {user && user.user_metadata.email}
