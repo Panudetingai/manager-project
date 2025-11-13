@@ -114,6 +114,44 @@ export type Database = {
           },
         ]
       }
+      social_key_config: {
+        Row: {
+          category: Database["public"]["Enums"]["social"] | null
+          created_at: string
+          env: Json | null
+          id: string
+          updated: string | null
+          user_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["social"] | null
+          created_at?: string
+          env?: Json | null
+          id?: string
+          updated?: string | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["social"] | null
+          created_at?: string
+          env?: Json | null
+          id?: string
+          updated?: string | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_key_config_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspace"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription: {
         Row: {
           created_at: string
@@ -426,6 +464,7 @@ export type Database = {
       }
     }
     Enums: {
+      social: "LINE" | "META" | "INSTAGRAM"
       subscription_role: "Premium" | "Pro"
       user_roles: "admin" | "user" | "guest" | "owner"
       workspace_role: "member" | "admin"
@@ -557,6 +596,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      social: ["LINE", "META", "INSTAGRAM"],
       subscription_role: ["Premium", "Pro"],
       user_roles: ["admin", "user", "guest", "owner"],
       workspace_role: ["member", "admin"],

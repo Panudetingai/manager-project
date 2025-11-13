@@ -32,7 +32,7 @@ function TextResponse({
             message.role === "user" ? "!bg-primary !px-3 !py-2 !rounded-full !text-muted" : ""
           }
         >
-          <MessageResponse controls={true} skipHtml={true} >
+          <MessageResponse controls={true}>
             {sanitizeText(partText.text)}
           </MessageResponse>
         </MessageContent>

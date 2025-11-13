@@ -1,6 +1,6 @@
 import { PayloadConversation } from "@/modules/feature/types/ai-service/api-types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getConversationById } from "../api";
+import { getConversationById } from "../server/api";
 
 function useSaveConversationAPI() {
   const mutate = useMutation({
