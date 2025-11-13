@@ -10,7 +10,7 @@ interface SignUpRequest {
 export async function SignUp({ email, password }: SignUpRequest) {
     const supabase = await createClient();
     const authService = createAuthService(supabase);
-    const result = await authService.EmailSignIn({
+    const result = await authService.EmailSignUp({
         email,
         password
     });

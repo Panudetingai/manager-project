@@ -20,7 +20,7 @@ class AuthService {
     public async EmailSignIn({email, password}: {email: string, password: string}) {
         const { data, error } = await AuthService.supabase.auth.signInWithPassword({
             email,
-            password
+            password,
         });
         if (error) throw error;
         return data;
@@ -35,7 +35,10 @@ class AuthService {
     public async EmailSignUp({email, password}: {email: string, password: string}) {
         const { data, error } = await AuthService.supabase.auth.signUp({
             email,
-            password
+            password,
+            options: {
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify-email`
+            }
         });
         if (error) throw error;
         return data;

@@ -19,14 +19,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Mail } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import AlertForm from "../../alert-form";
+import { APIAuthService } from "../../server/api";
 import { formSchemaSignUp, FormSchemaSignUp } from "../schema/form";
 import { SignUp } from "../server/api";
 
 export default function FormSignUp() {
+  const [isLoading, setisLoading] = useState(false);
+  const [mail, setmail] = useState<string>("");
+  const [verification, setVerification] = useState(false);
   const form = useForm<FormSchemaSignUp>({
     resolver: zodResolver(formSchemaSignUp),
     defaultValues: {
@@ -36,13 +40,51 @@ export default function FormSignUp() {
   });
 
   const onSubmit = async (value: FormSchemaSignUp) => {
+    setisLoading(true);
     const result = await SignUp(value);
-    if (result) {
-      toast.custom(() => (
-        <AlertForm.SignInAlert />
-      ));
+    setisLoading(false);
+    if (result.user?.identities?.[0]?.identity_data?.email_verified === false) {
+      setVerification(true);
+      setmail(value.email);
     }
   };
+
+  const handleGoogleSignIn = async () => {
+    await APIAuthService({
+      provider: "google",
+    });
+  };
+
+  if (verification) {
+    return (
+      <Card className="w-1/3 max-sm:w-2xl">
+        <CardHeader>
+          <CardTitle className="text-lg flex gap-2 items-center">
+            <Mail size={24} />
+            Verify Your Email
+          </CardTitle>
+          <CardDescription className="text-sm">
+            A verification link has been sent to {mail}. Please check your inbox
+            and click on the link to verify your email address.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Link href={"/auth/sign-in"} className="w-full cursor-pointer">
+            <Button
+              className="w-full"
+              variant={"outline"}
+              onClick={() => {
+                setmail("");
+                setVerification(false);
+              }}
+            >
+              Back to Sign In
+            </Button>
+          </Link>
+        </CardFooter>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-sm">
@@ -81,18 +123,28 @@ export default function FormSignUp() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                    <FormLabel className="text-sm">Password</FormLabel>
+                  <FormLabel className="text-sm">Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input
+                      placeholder="Enter your password"
+                      type="password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Sign In</Button>
-            <Button variant={"outline"}>
+            <Button disabled={isLoading} type="submit">
+              {isLoading ? (
+                <Loader2 width={16} height={16} className="animate-spin" />
+              ) : (
+                "Sign Up"
+              )}
+            </Button>
+            <Button variant={"outline"} onClick={handleGoogleSignIn}>
               <GoogleSvg theme="dark" />
-              Sign in with Google
+              Sign In with Google
             </Button>
           </form>
         </Form>
@@ -100,8 +152,8 @@ export default function FormSignUp() {
       <CardFooter className="text-sm justify-center">
         <p className="text-center text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="#" className="underline hover:text-primary">
-            Sign up
+          <Link href="/auth/sign-in" className="underline hover:text-primary">
+            Sign in
           </Link>
         </p>
       </CardFooter>
