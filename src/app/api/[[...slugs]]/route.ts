@@ -3,6 +3,7 @@ import AIServiceAPI from "@/modules/ai-service/server/route";
 import { default as auth_callback } from "@/modules/auth/server/route";
 import workspace from "@/modules/manager/server/routes/workspace";
 import { cors } from "@elysiajs/cors";
+import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 const app = new Elysia({ prefix: "/api" })
   .use(
@@ -18,6 +19,7 @@ const app = new Elysia({ prefix: "/api" })
   .use(auth_callback)
   .use(workspace)
   .use(webhook)
+  .use(swagger())
   .group("/ai-service", (app) => app.use(AIServiceAPI));
 
 export const GET = (req: Request) => app.handle(req);
