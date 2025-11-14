@@ -1,4 +1,4 @@
-import { CirclePlus, CreditCard, Facebook, Instagram, LayoutDashboard, LucideIcon, Settings2, SettingsIcon, SparkleIcon, SquareM, Users2, UsersRound } from "lucide-react";
+import { CirclePlus, CreditCard, Facebook, Instagram, LayoutDashboard, LucideIcon, Send, Settings2, SettingsIcon, SparkleIcon, SquareM, Users2, UsersRound } from "lucide-react";
 import z from "zod";
 import pathsConfig from "../../../../config/app.router";
 import { Database } from "../../../../utils/supabase/database.types";
@@ -90,6 +90,12 @@ export const APP_ROUTE: AppRoute[] = [
         path: pathsConfig.feature.aichat,
         icon: SparkleIcon,
         role: ["owner"],
+      },
+      {
+        label: "Post Manager",
+        path: pathsConfig.feature.postManager,
+        icon: Send,
+        role: ["owner", "admin", "user"],
       }
     ]
   },

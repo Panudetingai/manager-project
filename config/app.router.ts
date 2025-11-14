@@ -22,6 +22,7 @@ const PathsSchema = z.object({
   }),
   feature: z.object({
     aichat: z.string().min(1),
+    postManager: z.string().min(1),
   }),
   join: z.object({
     menubarjoin: z.string().min(1),
@@ -58,6 +59,7 @@ const pathsConfig = PathsSchema.parse({
   },
   feature: {
     aichat: "/dashboard/[workspace]/ai-chat",
+    postManager: "/dashboard/[workspace]/posts",
   },
   setting: {
     workspaceSettingsSocialAccountsLineAPI: "/dashboard/[workspace]/settings/social-accounts/line",
