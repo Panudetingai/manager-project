@@ -22,7 +22,7 @@ export default async function LayoutDashboardProject({
       <main className="w-full rounded-sm">
         <SocketProvider userId={user.id}>
           <AppHeader />
-          <div className="p-4">{children}</div>
+          <div className="p-4 relative">{children}</div>
         </SocketProvider>
       </main>
     </SidebarProvider>
