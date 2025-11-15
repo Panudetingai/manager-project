@@ -24,3 +24,12 @@ export interface OptionParameter {
   option: Parameters<typeof streamText>[0];
   messages: UIMessage[];
 }
+
+export interface AIToolsPostsOutput {
+  images: string[];
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+  provider: string;
+}

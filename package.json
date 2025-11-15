@@ -83,6 +83,7 @@
     "stripe": "^18.5.0",
     "supabase": "^2.40.7",
     "tailwind-merge": "^3.3.1",
+    "unsplash-js": "^7.0.20",
     "use-stick-to-bottom": "^1.1.1",
     "vaul": "^1.1.2",
     "zod": "^4.1.8",

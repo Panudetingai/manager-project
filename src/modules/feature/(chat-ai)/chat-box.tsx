@@ -12,19 +12,25 @@ import {
 } from "@/components/ai-elements/reasoning";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import React, { Fragment, useEffect, useState } from "react";
-import { AIServiceTypeOption } from "../ai-service/ai.service";
-import { useConversationAPI } from "../ai-service/hooks/action";
-import ChatEmpty from "./(chat-ai)/chat-empty";
-import ChatboxLoading from "./(chat-ai)/chatbox-loading";
-import ImagePreview from "./(chat-ai)/image-input";
-import PromptInputBox from "./(chat-ai)/prompt-input";
+import { AIServiceTypeOption } from "../../ai-service/ai.service";
+import { useConversationAPI } from "../../ai-service/hooks/action";
+import { PostCard } from "../../manager/overview/components/cards/post-card";
+import {
+  useChatControls,
+  useChatStore,
+  useChatStoreAffiliate,
+} from "../store/ai-service/chatStore";
+import { AIToolsPostsOutput } from "../types/ai-service/ai-service-type";
+import ChatEmpty from "./chat-empty";
+import ChatboxLoading from "./chatbox-loading";
+import ImagePreview from "./image-input";
+import PromptInputBox from "./prompt-input";
 import TextResponse, {
   MessageErrorResponse,
   ThinkingMessage,
-} from "./(chat-ai)/text-reponse";
-import { useChatControls } from "./store/ai-service/chatStore";
+} from "./text-reponse";
 
 interface ChatBoxProps {
   params?: {
@@ -36,14 +42,19 @@ function ChatBox({ params }: ChatBoxProps) {
   const { modal, modalType } = useChatControls();
   const [generateId, setGenerateId] = useState<string>("");
   const reasoningRef = React.useRef<HTMLDivElement>(null);
+  const { Show } = useChatStoreAffiliate();
+  const { seterror } = useChatStore();
   const { mutate: saveConversation } =
     useConversationAPI.useSaveConversationAPI();
 
   const generateIdRef = React.useRef<string>("");
-  let getConversation: ReturnType<typeof useConversationAPI.useGetConversationByIdAPI> | null =
-    null;
+  let getConversation: ReturnType<
+    typeof useConversationAPI.useGetConversationByIdAPI
+  > | null = null;
   if (params?.id) {
-    getConversation = useConversationAPI.useGetConversationByIdAPI(params?.id || generateId);
+    getConversation = useConversationAPI.useGetConversationByIdAPI(
+      params?.id || generateId
+    );
   }
 
   const { messages, setMessages, sendMessage, status } = useChat({
@@ -70,6 +81,9 @@ function ChatBox({ params }: ChatBoxProps) {
           },
         });
       }
+    },
+    onError: (err) => {
+      seterror(err.message);
     },
   });
 
@@ -102,7 +116,9 @@ function ChatBox({ params }: ChatBoxProps) {
   }
 
   return (
-    <div className={`flex flex-col gap-4`}>
+    <div
+      className={`flex flex-col gap-4`}
+    >
       <div className="relative size-full max-h-[70vh] h-[70vh]">
         <div className="flex flex-col h-full">
           <Conversation>
@@ -127,6 +143,39 @@ function ChatBox({ params }: ChatBoxProps) {
                             isLastMessage={isLastMessage}
                           />
                         );
+                      case "tool-CreatePostAgent":
+                        switch (part.state) {
+                          case "input-available":
+                            return <div key={i}>Loading weather...</div>;
+                          case "output-available":
+                            const outputs = part.output as AIToolsPostsOutput[];
+                            return (
+                              <AnimatePresence key={i}>
+                                <motion.div
+                                  className={`grid gap-2 w-full ${
+                                    Show ? "grid-cols-1" : "grid-cols-2"
+                                  }`}
+                                >
+                                  {outputs.map((output, index) => (
+                                    <motion.div
+                                      key={index}
+                                    >
+                                      <PostCard
+                                        images={output.images}
+                                        title={output.title}
+                                        content={output.content}
+                                        category={output.category}
+                                        tags={[""]}
+                                        provider={output.provider}
+                                      />
+                                    </motion.div>
+                                  ))}
+                                </motion.div>
+                              </AnimatePresence>
+                            );
+                          default:
+                            return;
+                        }
                       case "file":
                         return (
                           <ImagePreview

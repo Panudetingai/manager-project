@@ -29,7 +29,7 @@ function TextResponse({
       <Message from={message.role}>
         <MessageContent
           className={
-            message.role === "user" ? "!bg-primary !px-3 !py-2 !rounded-full !text-muted" : ""
+            message.role === "user" ? "!bg-primary !px-3 !py-2 !rounded-full !text-muted my-4" : "my-4"
           }
         >
           <MessageResponse controls={true}>
@@ -101,8 +101,12 @@ export const MessageErrorResponse = () => {
         </div>
 
         <div className="flex w-full flex-col gap-2 md:gap-4">
-          <div className="p-0 text-muted-foreground text-sm">
-            {error?.message}
+          <div className="p-0 text-sm text-destructive">
+            {typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : ""}
           </div>
         </div>
       </div>

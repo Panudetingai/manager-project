@@ -1,4 +1,4 @@
-import Chatbox from "@/modules/feature/chat-box";
+import Chatbox from "@/modules/feature/(chat-ai)/chat-box";
 
 export default function page() {
   return (

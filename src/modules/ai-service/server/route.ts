@@ -1,4 +1,5 @@
 import { getUserServer } from "@/lib/supabase/getUser-server";
+import { errorHandler } from "@/modules/feature/func/error-handler";
 import { PayloadConversation } from "@/modules/feature/types/ai-service/api-types";
 import { StreamTextResult, ToolSet } from "ai";
 import Elysia from "elysia";
@@ -36,11 +37,13 @@ const AIServiceAPI = new Elysia()
         })) as StreamTextResult<ToolSet, never>;
         return result.toUIMessageStreamResponse({
           sendReasoning: true,
+          onError: errorHandler,
           messageMetadata: ({ part }) => {
             if (part.type === "finish") {
               return {
                 model: part.finishReason,
                 totalTokens: part.totalUsage.totalTokens,
+                
               };
             }
             if (part.type === "tool-result") {

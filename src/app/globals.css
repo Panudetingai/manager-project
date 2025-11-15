@@ -127,6 +127,15 @@
     padding-right: 2%;
   }
 
+  .scroll-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scroll-none::-webkit-scrollbar {
+    display: none;
+  }
+
   .scroll-custom::-webkit-scrollbar {
     width: 8px;
     margin-left: 4px;

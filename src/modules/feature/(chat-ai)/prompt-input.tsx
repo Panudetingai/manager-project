@@ -44,8 +44,8 @@ const models: ModelsType[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Claude_AI_symbol.svg/2048px-Claude_AI_symbol.svg.png",
   },
   {
-    id: "gemma-3-12b-it",
-    name: "Gemini 1.5 Flash",
+    id: "gemini-2.0-flash",
+    name: "Gemini 2.0 Flash",
     type: "gemini",
     modelIcon:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW26_bYY4S2PRKRtkug3XVKDIHhpwXhp_oYQ&s",

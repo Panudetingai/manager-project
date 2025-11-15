@@ -1,114 +1,171 @@
 "use client";
+import { MessageResponse } from "@/components/ai-elements/message";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
 } from "@/components/ui/card";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getPostManagerFeatureApi } from "@/modules/feature/(post-manager)/server/api";
+import {
+  useChatStoreAffiliate,
+  useChatStorePost,
+} from "@/modules/feature/store/ai-service/chatStore";
+import { AIToolsPostsOutput } from "@/modules/feature/types/ai-service/ai-service-type";
+import { useWorkspaceState } from "@/modules/manager/store/workspace-state";
+import { useQuery } from "@tanstack/react-query";
 import { Plus, SendHorizonal } from "lucide-react";
 import { motion } from "motion/react";
+import { div } from "motion/react-client";
+import { useRef, useState } from "react";
 
-const ImageStc = [
-  {
-    src: "https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg",
-    alt: "Post Image 1",
-  },
-  {
-    src: "https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=600",
-    alt: "Post Image 2",
-  },
-  {
-    src: "https://images.pexels.com/photos/1181306/pexels-photo-1181306.jpeg?auto=compress&cs=tinysrgb&w=600",
-    alt: "Post Image 3",
-  },
-  {
-    src: "https://images.pexels.com/photos/1181356/pexels-photo-1181356.jpeg?auto=compress&cs=tinysrgb&w=600",
-    alt: "Post Image 4",
-  },
-  {
-    src: "https://images.pexels.com/photos/1181672/pexels-photo-1181672.jpeg?auto=compress&cs=tinysrgb&w=600",
-    alt: "Post Image 5",
-  },
-];
+function PostCard({
+  images,
+  title,
+  content,
+  category,
+  provider,
+}: Partial<AIToolsPostsOutput>) {
+  const [imageIndex, setImageIndex] = useState(0);
+  const { setShow, setShowType, Show, showType } = useChatStoreAffiliate();
+  const { workspaceId } = useWorkspaceState();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { setPostData } = useChatStorePost();
 
-function PostCard() {
+  const handleDotClick = (idx: number) => {
+    if (!images) return;
+    setImageIndex(idx);
+    if (scrollRef.current) {
+      const scrollWidth = scrollRef.current.scrollWidth;
+      const childCount = images.length;
+      const scrollTo = (scrollWidth / childCount) * idx;
+      scrollRef.current.scrollTo({
+        left: scrollTo,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleScroll = () => {
+    if (!images) return;
+    if (scrollRef.current && images?.length > 0) {
+      const scrollLeft = scrollRef.current.scrollLeft;
+      const scrollWidth = scrollRef.current.scrollWidth;
+      const childCount = images.length;
+      const idx = Math.round((scrollLeft / scrollWidth) * childCount);
+      setImageIndex(idx);
+    }
+  };
+
+  const post = useQuery({
+    queryKey: [
+      "create-post-ai-service",
+      { title, content, category, images, provider },
+    ],
+    queryFn: async () => {
+      return await getPostManagerFeatureApi(workspaceId);
+    },
+    enabled: !Show && !showType,
+  });
+
   return (
-    <Card className="w-full overflow-hidden">
-      <CardHeader>
-        <div
-          className={`w-full grid gap-2 ${
-            ImageStc.length === 1
-              ? "grid-cols-1"
-              : ImageStc.length === 2
-              ? "grid-cols-2"
-              : "grid-cols-2"
-          }`}
-          style={{
-            gridTemplateRows: ImageStc.length > 2 ? "repeat(2, 1fr)" : "1fr",
-            overflow: "hidden",
-          }}
-        >
-          {ImageStc.slice(0, 3).map((image, index) => (
-            <motion.img
-              key={index}
-              src={image.src}
-              alt={image.alt}
-              className={`object-cover w-full h-full rounded hover:opacity-75 ${
-                ImageStc.length === 1 ? "" : "aspect-square"
+    <div>
+      {post.data &&
+        post.data.length > 0 &&
+        post.data.map((posts, index) => (
+          <>
+            <Card
+              className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${
+                Show && showType === "Posts" ? "w-3/4" : "w-full"
               }`}
-              style={{
-                height:
-                  ImageStc.length === 1
-                    ? "100%"
-                    : ImageStc.length === 2
-                    ? "100%"
-                    : "100%",
+              onClick={() => {
+                setShow(true);
+                setShowType("Posts");
+                setPostData({ images, title, content, category, provider });
               }}
-            />
-          ))}
-          {ImageStc.length > 4 && (
-            <div className="relative bg-muted/80 flex items-center justify-center text-lg font-semibold rounded">
-              <span>+{ImageStc.length - 4}</span>
-            </div>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-2">
-          <h3 className="text-md font-semibold line-clamp-2">
-            Introducing Our Latest Product: The Ultimate Productivity
-          </h3>
-          <p className="text-sm text-muted-foreground line-clamp-3">
-            Discover how our new product can revolutionize your workflow and
-            boost your efficiency to new heights.
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="border-t flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <motion.img
-            className="w-6 h-6 rounded-full"
-            src="https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
-            alt="Groq"
-          />
-          <span className="text-muted-foreground font-medium">Groq</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-muted-foreground">12 comments</span>
-          <span className="text-xs text-muted-foreground">24 likes</span>
-          <Button variant="ghost" size="sm">
-            Share
-            <SendHorizonal size={8} />
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
+            >
+              <CardHeader>
+                <div
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  className="snap-x flex gap-2 overflow-x-scroll scroll-none"
+                >
+                  {images &&
+                    images.map((image, index) => (
+                      <div key={index} className="snap-center w-full">
+                        <motion.img
+                          src={image}
+                          alt={`Post Image ${index + 1}`}
+                          className={`w-full min-w-[18rem] h-62 object-cover rounded-md mb-4 transition-transform duration-500 ease-in-out`}
+                        />
+                      </div>
+                    ))}
+                </div>
+                {images && images.length > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-2">
+                    {(images || posts.images).map((_, idx) => (
+                      <button
+                        key={idx}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          imageIndex === idx
+                            ? "bg-primary scale-110"
+                            : "bg-muted-foreground opacity-50"
+                        }`}
+                        onClick={() => handleDotClick(idx)}
+                        aria-label={`Go to image ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-md font-semibold line-clamp-2">
+                    {title
+                      ? title
+                      : "Introducing Our Latest Product: Revolutionizing Your Workflow"}
+                  </h3>
+                  <MessageResponse className="text-sm text-muted-foreground line-clamp-3">
+                    {content
+                      ? content
+                      : "Discover how our new product can revolutionize your workflow and boost your efficiency to new heights."}
+                  </MessageResponse>
+                </div>
+              </CardContent>
+              <CardFooter className="border-t flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <motion.img
+                    className="w-6 h-6 rounded-full"
+                    src="https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
+                    alt="Groq"
+                  />
+                  <span className="text-muted-foreground font-medium">
+                    {provider}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs text-muted-foreground">
+                    12 comments
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    24 likes
+                  </span>
+                  <Button variant="ghost" size="sm">
+                    Share
+                    <SendHorizonal size={8} />
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          </>
+        ))}
+    </div>
   );
 }
 
@@ -147,4 +204,3 @@ function PostContent({ children }: { children: React.ReactNode }) {
 }
 
 export { PostBody, PostCard, PostCardHeader, PostContent, PostTitle };
-

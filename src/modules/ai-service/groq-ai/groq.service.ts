@@ -2,8 +2,10 @@ import {
   GroqModelId,
   OptionParameter,
 } from "@/modules/feature/types/ai-service/ai-service-type";
-import { createGroq } from "@ai-sdk/groq";
-import { streamText } from "ai";
+import { createGroq, groq } from "@ai-sdk/groq";
+import { streamText, Tool } from "ai";
+import { SystemPrompts } from "../prompts";
+import { CreatePostAgent } from "../tools/create-post-agent";
 
 interface GroqConfig {
   apiurl?: string;
@@ -40,7 +42,7 @@ class GroqService {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant.",
+          content: SystemPrompts.PromptDefault,
         },
         {
           role: "user",
@@ -69,13 +71,21 @@ class GroqService {
           ],
         },
       ],
+      tools: paramater.id.includes("openai/gpt-oss-120b")
+        ? {
+            browser_search: groq.tools.browserSearch({}) as Tool<unknown, unknown>,
+            CreatePostAgent,
+          }
+        : {
+            CreatePostAgent,
+          },
+      toolChoice: "auto",
       providerOptions: {
         groq: {
-          structuredOutputs: false
+          structuredOutputs: false,
         },
       },
     });
-
     return result;
   }
 }
