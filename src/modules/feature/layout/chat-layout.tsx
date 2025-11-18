@@ -6,7 +6,7 @@ import ChatBox from "../(chat-ai)/chat-box";
 import { useChatStoreAffiliate } from "../store/ai-service/chatStore";
 
 interface ChatlayoutProps {
-  params: {
+  params?: {
     id: Promise<string>;
   };
 }
@@ -18,6 +18,8 @@ export default function Chatlayout({ params }: ChatlayoutProps) {
     flex: Show && showType === "Posts" ? 1 : 2,
     flex1: Show && showType === "Posts" ? 1 : 1,
   };
+
+  console.log("ShowType", Show, showType);
 
   return (
     <motion.div
@@ -33,9 +35,11 @@ export default function Chatlayout({ params }: ChatlayoutProps) {
           //   transition={{ duration: 0.7 }}
           className="flex-1 duration-150 transition-all"
         >
-          <ChatBox params={{ id: params.id }} />
+          <ChatBox params={{ id: params?.id }} />
         </motion.div>
-        <AnimatePresence>{Show && <AffiliateBox />}</AnimatePresence>
+        {Show && showType === "Posts" && (
+          <AnimatePresence>{<AffiliateBox />}</AnimatePresence>
+        )}
       </div>
     </motion.div>
   );

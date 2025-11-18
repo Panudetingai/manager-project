@@ -33,8 +33,8 @@ import TextResponse, {
 } from "./text-reponse";
 
 interface ChatBoxProps {
-  params?: {
-    id: Promise<string>;
+  params: {
+    id?: Promise<string>;
   };
 }
 

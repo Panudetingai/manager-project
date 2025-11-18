@@ -12,14 +12,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getPostManagerFeatureApi } from "@/modules/feature/(post-manager)/server/api";
 import {
   useChatStoreAffiliate,
   useChatStorePost,
 } from "@/modules/feature/store/ai-service/chatStore";
 import { AIToolsPostsOutput } from "@/modules/feature/types/ai-service/ai-service-type";
 import { useWorkspaceState } from "@/modules/manager/store/workspace-state";
-import { useQuery } from "@tanstack/react-query";
 import { Plus, SendHorizonal } from "lucide-react";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
@@ -62,16 +60,16 @@ function PostCard({
     }
   };
 
-  const post = useQuery({
-    queryKey: [
-      "create-post-ai-service",
-      { title, content, category, images, provider },
-    ],
-    queryFn: async () => {
-      return await getPostManagerFeatureApi(workspaceId);
-    },
-    enabled: !Show && !showType,
-  });
+  // const post = useQuery({
+  //   queryKey: [
+  //     "create-post-ai-service",
+  //     { title, content, category, images, provider },
+  //   ],
+  //   queryFn: async () => {
+  //     return await getPostManagerFeatureApi(workspaceId);
+  //   },
+  //   enabled: !Show && !showType,
+  // });
 
   return (
     <Card

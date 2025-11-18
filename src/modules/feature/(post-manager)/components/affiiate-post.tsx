@@ -7,8 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { motion } from "motion/react";
 import {
-    useChatStoreAffiliate,
-    useChatStorePost,
+  useChatStoreAffiliate,
+  useChatStorePost,
 } from "../../store/ai-service/chatStore";
 import { createPostManagerFeatureApi } from "../server/api";
 export default function AffiliatePost() {
