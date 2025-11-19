@@ -49,7 +49,6 @@ export async function getPostManagerFeatureApi(workspaceId: string) {
       .select("*")
       .eq("workspace_owner_id", workspaceId)
       .eq("user_owner_id", user.id)
-      .order("", { ascending: false });
 
     if (error) {
       throw error;

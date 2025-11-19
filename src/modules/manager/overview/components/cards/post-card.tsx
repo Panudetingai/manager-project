@@ -12,30 +12,26 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  useChatStoreAffiliate,
-  useChatStorePost,
-} from "@/modules/feature/store/ai-service/chatStore";
-import { AIToolsPostsOutput } from "@/modules/feature/types/ai-service/ai-service-type";
+import { getPostManagerFeatureApi } from "@/modules/feature/(post-manager)/server/api";
 import { useWorkspaceState } from "@/modules/manager/store/workspace-state";
+import { useQuery } from "@tanstack/react-query";
 import { Plus, SendHorizonal } from "lucide-react";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 
-function PostCard({
-  images,
-  title,
-  content,
-  category,
-  provider,
-}: Partial<AIToolsPostsOutput>) {
+function PostCard() {
   const [imageIndex, setImageIndex] = useState(0);
-  const { setShow, setShowType, Show, showType } = useChatStoreAffiliate();
-  const { workspaceId } = useWorkspaceState();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { setPostData } = useChatStorePost();
+  const { workspaceId } = useWorkspaceState();
 
-  const handleDotClick = (idx: number) => {
+  const posts = useQuery({
+    queryKey: [],
+    queryFn: async () => {
+      return await getPostManagerFeatureApi(workspaceId);
+    },
+  });
+
+  const handleDotClick = (idx: number, images: string[]) => {
     if (!images) return;
     setImageIndex(idx);
     if (scrollRef.current) {
@@ -49,7 +45,7 @@ function PostCard({
     }
   };
 
-  const handleScroll = () => {
+  const handleScroll = (images: string[]) => {
     if (!images) return;
     if (scrollRef.current && images?.length > 0) {
       const scrollLeft = scrollRef.current.scrollLeft;
@@ -60,95 +56,97 @@ function PostCard({
     }
   };
 
-  // const post = useQuery({
-  //   queryKey: [
-  //     "create-post-ai-service",
-  //     { title, content, category, images, provider },
-  //   ],
-  //   queryFn: async () => {
-  //     return await getPostManagerFeatureApi(workspaceId);
-  //   },
-  //   enabled: !Show && !showType,
-  // });
+  if (!posts.data) return "no Posts!";
+
+  const imageisArray = posts.data.map((i) =>
+    typeof i.images === "string" ? JSON.parse(i.images) : i.images
+  );
 
   return (
-    <Card
-      className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${
-        Show && showType === "Posts" ? "w-3/4" : "w-full"
-      }`}
-      onClick={() => {
-        setShow(true);
-        setShowType("Posts");
-        setPostData({ images, title, content, category, provider });
-      }}
-    >
-      <CardHeader>
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="snap-x flex gap-2 overflow-x-scroll scroll-none"
+    <>
+      {posts.data.map((post) => (
+        <Card
+          key={post.id}
+          className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 w-full`}
         >
-          {images &&
-            images.map((image, index) => (
-              <div key={index} className="snap-center w-full">
-                <motion.img
-                  src={image}
-                  alt={`Post Image ${index + 1}`}
-                  className={`w-full min-w-[18rem] h-62 object-cover rounded-md mb-4 transition-transform duration-500 ease-in-out`}
-                />
+          <CardHeader>
+            <div
+              ref={scrollRef}
+              onScroll={() =>
+                Array.isArray(post.images) && handleScroll(post.images)
+              }
+              className="snap-x flex gap-2 overflow-x-scroll scroll-none"
+            >
+              {imageisArray.map((images) =>
+                images.map((image: string, index: number) => (
+                  <div key={index} className="snap-center w-full">
+                    <motion.img
+                      src={image}
+                      alt={`Post Image ${index + 1}`}
+                      className={`w-full min-w-[18rem] h-62 object-cover rounded-md mb-4 transition-transform duration-500 ease-in-out`}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+            {post.images && post.images.length > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-2">
+                {Array.isArray(post.images) &&
+                  post.images.map((_, idx) => (
+                    <button
+                      key={idx}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        imageIndex === idx
+                          ? "bg-primary scale-110"
+                          : "bg-muted-foreground opacity-50"
+                      }`}
+                      onClick={() =>
+                        Array.isArray(post.images) &&
+                        handleDotClick(idx, post.images)
+                      }
+                      aria-label={`Go to image ${idx + 1}`}
+                    />
+                  ))}
               </div>
-            ))}
-        </div>
-        {images && images.length > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-2">
-            {(images).map((_, idx) => (
-              <button
-                key={idx}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  imageIndex === idx
-                    ? "bg-primary scale-110"
-                    : "bg-muted-foreground opacity-50"
-                }`}
-                onClick={() => handleDotClick(idx)}
-                aria-label={`Go to image ${idx + 1}`}
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-md font-semibold line-clamp-2">
+                {post.title
+                  ? post.title
+                  : "Introducing Our Latest Product: Revolutionizing Your Workflow"}
+              </h3>
+              <MessageResponse className="text-sm text-muted-foreground line-clamp-3">
+                {post.content
+                  ? post.content
+                  : "Discover how our new product can revolutionize your workflow and boost your efficiency to new heights."}
+              </MessageResponse>
+            </div>
+          </CardContent>
+          <CardFooter className="border-t flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <motion.img
+                className="w-6 h-6 rounded-full"
+                src="https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
+                alt="Groq"
               />
-            ))}
-          </div>
-        )}
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-2">
-          <h3 className="text-md font-semibold line-clamp-2">
-            {title
-              ? title
-              : "Introducing Our Latest Product: Revolutionizing Your Workflow"}
-          </h3>
-          <MessageResponse className="text-sm text-muted-foreground line-clamp-3">
-            {content
-              ? content
-              : "Discover how our new product can revolutionize your workflow and boost your efficiency to new heights."}
-          </MessageResponse>
-        </div>
-      </CardContent>
-      <CardFooter className="border-t flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <motion.img
-            className="w-6 h-6 rounded-full"
-            src="https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
-            alt="Groq"
-          />
-          <span className="text-muted-foreground font-medium">{provider}</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-muted-foreground">12 comments</span>
-          <span className="text-xs text-muted-foreground">24 likes</span>
-          <Button variant="ghost" size="sm">
-            Share
-            <SendHorizonal size={8} />
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
+              <span className="text-muted-foreground font-medium">
+                {post.provider}
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-muted-foreground">12 comments</span>
+              <span className="text-xs text-muted-foreground">24 likes</span>
+              <Button variant="ghost" size="sm">
+                Share
+                <SendHorizonal size={8} />
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
+      ))}
+    </>
   );
 }
 

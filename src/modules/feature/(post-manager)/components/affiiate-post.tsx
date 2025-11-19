@@ -22,6 +22,8 @@ export default function AffiliatePost() {
         ...posts,
         workspaceId,
       });
+    }, onError: (error) => {
+      throw new Error("Failed to create post", error);
     },
   });
 

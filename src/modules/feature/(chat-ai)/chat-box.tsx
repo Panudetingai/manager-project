@@ -14,9 +14,9 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { AnimatePresence, motion } from "motion/react";
 import React, { Fragment, useEffect, useState } from "react";
+import PostAffiliate from "../(post-manager)/components/post-affiliatte";
 import { AIServiceTypeOption } from "../../ai-service/ai.service";
 import { useConversationAPI } from "../../ai-service/hooks/action";
-import { PostCard } from "../../manager/overview/components/cards/post-card";
 import {
   useChatControls,
   useChatStore,
@@ -160,7 +160,7 @@ function ChatBox({ params }: ChatBoxProps) {
                                     <motion.div
                                       key={index}
                                     >
-                                      <PostCard
+                                      <PostAffiliate
                                         images={output.images}
                                         title={output.title}
                                         content={output.content}
