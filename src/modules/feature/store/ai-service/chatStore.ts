@@ -25,8 +25,8 @@ export const useChatStore = create<ChatStoreState>((set) => ({
 }));
 
 interface ChatControls {
-  modalType: ModelsType['type'];
-  setModalType: (type: ModelsType['type']) => void;
+  modalType: ModelsType["chefSlug"];
+  setModalType: (type: ModelsType['chefSlug']) => void;
   modal: ModelsType['id'];
   setModal: (model: ModelsType['id']) => void;
   webSearch?: boolean;
