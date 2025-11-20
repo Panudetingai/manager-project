@@ -4,14 +4,14 @@ import { MessageResponse } from "@/components/ai-elements/message";
 import { Button } from "@/components/ui/button";
 import { useWorkspaceState } from "@/modules/manager/store/workspace-state";
 import { useMutation } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { motion } from "motion/react";
 import {
   useChatStoreAffiliate,
   useChatStorePost,
 } from "../../store/ai-service/chatStore";
 import { createPostManagerFeatureApi } from "../server/api";
-export default function AffiliatePost() {
+export default function  AffiliatePost() {
   const { setShow, Show, showType } = useChatStoreAffiliate();
   const posts = useChatStorePost();
   const { workspaceId } = useWorkspaceState();
@@ -24,6 +24,8 @@ export default function AffiliatePost() {
       });
     }, onError: (error) => {
       throw new Error("Failed to create post", error);
+    }, onSuccess: () => {
+      setShow(false);
     },
   });
 
@@ -72,7 +74,9 @@ export default function AffiliatePost() {
         <MessageResponse>{posts.content}</MessageResponse>
       </div>
       <div className="footer mt-4">
-        <Button className="w-full" onClick={() => mutate.mutate()}>Create Post</Button>
+        <Button className="w-full" onClick={() => mutate.mutate()}>
+          {mutate.isPending ? (<Loader2 className="animate-spin" width={16} height={16} />) : "Create Post"}
+        </Button>
       </div>
     </motion.div>
   );

@@ -25,9 +25,9 @@ export default function Chatlayout({ params }: ChatlayoutProps) {
     <motion.div
       initial={{ opacity: 0, maxWidth: "56rem", flex: classFlex.flex }}
       animate={{ opacity: 1, maxWidth: Show ? "100%" : "56rem" }}
-      className={`flex flex-col max-w-4 mx-auto w-full max-sm:w-full`}
+      className={`flex flex-col max-w-4 mx-auto h-full w-full max-sm:w-full`}
     >
-      <div className="flex w-full">
+      <div className="flex w-full h-full">
         <motion.div
           key="chat-box"
           initial={{ flex: 1 }}

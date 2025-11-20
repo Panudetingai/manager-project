@@ -1,6 +1,7 @@
-import { Action, Actions } from "@/components/ai-elements/actions";
 import {
   Message,
+  MessageAction,
+  MessageActions,
   MessageContent,
   MessageResponse,
 } from "@/components/ai-elements/message";
@@ -9,7 +10,6 @@ import { CopyIcon, RefreshCcwIcon, SparklesIcon } from "lucide-react";
 import { motion } from "motion/react";
 import React, { Fragment } from "react";
 import { useChatStore } from "../store/ai-service/chatStore";
-import { sanitizeText } from "../utils/sanitizeText";
 type Props = {
   message: UIMessage<unknown, UIDataTypes, UITools>;
   partText: TextUIPart;
@@ -18,37 +18,57 @@ type Props = {
   isLastMessage: boolean;
 };
 
+export const markdown = `React hooks are special functions that let you use React features in function components. The most common ones are:
+
+- **useState** - for managing component state
+- **useEffect** - for side effects like data fetching
+- **useContext** - for consuming context values
+- **useRef** - for accessing DOM elements
+
+Here's a simple example:
+
+\`\`\`jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Clicked {count} times
+    </button>
+  );
+}
+\`\`\`
+
+Which specific hook would you like to learn more about?`;
+
 function TextResponse({
+  index,
   message,
   partText,
   // regenerate,
   isLastMessage,
 }: Props) {
+  console.log(partText.text);
+
   return (
-    <Fragment>
+    <Fragment key={index}>
       <Message from={message.role}>
-        <MessageContent
-          className={
-            message.role === "user" ? "!bg-primary !px-3 !py-2 !rounded-full !text-muted my-4" : "my-4"
-          }
-        >
-          <MessageResponse controls={true}>
-            {sanitizeText(partText.text)}
-          </MessageResponse>
+        <MessageContent key={message.id}>
+          <MessageResponse>{partText.text}</MessageResponse>
         </MessageContent>
       </Message>
-      {message.role === "assistant" && isLastMessage && (
-        <Actions>
-          <Action label="Retry">
+      {isLastMessage && (
+        <MessageActions>
+          <MessageAction label="Retry">
             <RefreshCcwIcon className="size-3" />
-          </Action>
-          <Action
+          </MessageAction>
+          <MessageAction
             onClick={() => navigator.clipboard.writeText(partText.text)}
             label="Copy"
           >
             <CopyIcon className="size-3" />
-          </Action>
-        </Actions>
+          </MessageAction>
+        </MessageActions>
       )}
     </Fragment>
   );
@@ -73,9 +93,7 @@ export const ThinkingMessage = () => {
         </div>
 
         <div className="flex w-full flex-col gap-2 md:gap-4">
-          <div className="p-0 text-muted-foreground text-sm">
-            Thinking...
-          </div>
+          <div className="p-0 text-muted-foreground text-sm">Thinking...</div>
         </div>
       </div>
     </motion.div>
@@ -84,9 +102,9 @@ export const ThinkingMessage = () => {
 
 export const MessageErrorResponse = () => {
   const role = "assistant";
-  const {error} = useChatStore()
+  const { error } = useChatStore();
   return (
-     <motion.div
+    <motion.div
       animate={{ opacity: 1 }}
       className="group/message w-full"
       data-role={role}
@@ -111,7 +129,7 @@ export const MessageErrorResponse = () => {
         </div>
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
 export default React.memo(TextResponse);

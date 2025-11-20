@@ -2,10 +2,10 @@ import {
   GroqModelId,
   OptionParameter,
 } from "@/modules/feature/types/ai-service/ai-service-type";
-import { createGroq, groq } from "@ai-sdk/groq";
+import { createGroq } from "@ai-sdk/groq";
 import { streamText, Tool } from "ai";
 import { SystemPrompts } from "../prompts";
-import { CreatePostAgent } from "../tools/create-post-agent";
+import { Tools } from "./func/groq";
 
 interface GroqConfig {
   apiurl?: string;
@@ -71,20 +71,7 @@ class GroqService {
           ],
         },
       ],
-      tools: paramater.id.includes("openai/gpt-oss-120b")
-        ? {
-            browser_search: groq.tools.browserSearch({}) as Tool<unknown, unknown>,
-            CreatePostAgent,
-          }
-        : {
-            CreatePostAgent,
-          },
-      toolChoice: "auto",
-      providerOptions: {
-        groq: {
-          structuredOutputs: false,
-        },
-      },
+      tools: Tools(paramater.option.model) as Record<string, Tool<unknown, unknown>>,
     });
     return result;
   }

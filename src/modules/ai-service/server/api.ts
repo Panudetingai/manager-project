@@ -15,7 +15,6 @@ export async function createConversation({ payload }: Conversation) {
     ...payload,
   });
 
-  console.log("conversions save function db", error)
   if (error) return error;
 
   return data;

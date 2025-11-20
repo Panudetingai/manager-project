@@ -6,6 +6,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { AppBreadcrumb } from "./app-breadcrumb";
 import AppNotify from "./app-notify";
+import AppToggleMode from "./app-toggle-mode";
 
 export default function AppHeader() {
   return (
@@ -18,6 +19,7 @@ export default function AppHeader() {
         </div>
         <div className="flex items-center space-x-4">
           <AppNotify />
+          <AppToggleMode />
         </div>
       </header>
     </SidebarInset>

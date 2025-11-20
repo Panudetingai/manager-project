@@ -13,6 +13,7 @@ import {
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { AnimatePresence, motion } from "motion/react";
+import { redirect, useParams } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
 import PostAffiliate from "../(post-manager)/components/post-affiliatte";
 import { AIServiceTypeOption } from "../../ai-service/ai.service";
@@ -44,6 +45,7 @@ function ChatBox({ params }: ChatBoxProps) {
   const reasoningRef = React.useRef<HTMLDivElement>(null);
   const { Show } = useChatStoreAffiliate();
   const { seterror } = useChatStore();
+  const { project } = useParams();
   const { mutate: saveConversation } =
     useConversationAPI.useSaveConversationAPI();
 
@@ -54,7 +56,9 @@ function ChatBox({ params }: ChatBoxProps) {
   if (params?.id) {
     getConversation = useConversationAPI.useGetConversationByIdAPI(
       params?.id || generateId
-    );
+    ).isError
+      ? redirect(`/dashboard/${project}/ai-chat`)
+      : useConversationAPI.useGetConversationByIdAPI(params?.id || generateId);
   }
 
   const { messages, setMessages, sendMessage, status } = useChat({
@@ -115,107 +119,111 @@ function ChatBox({ params }: ChatBoxProps) {
     return <ChatboxLoading />;
   }
 
+  console.log(messages);
+
   return (
     <div
-      className={`flex flex-col gap-4`}
+      className={`relative h-full`}
     >
-      <div className="relative size-full max-h-[70vh] h-[70vh]">
-        <div className="flex flex-col h-full">
-          <Conversation>
-            <ConversationContent>
-              {messages.length === 0 && status !== "submitted" && (
-                <ConversationEmptyState className="justify-start items-start p-0">
-                  <ChatEmpty />
-                </ConversationEmptyState>
-              )}
-              {messages.map((message, messageIndex) => (
-                <Fragment key={messageIndex}>
-                  {message.parts.map((part, i) => {
-                    switch (part.type) {
-                      case "text":
-                        const isLastMessage = i === message.parts.length - 1;
+      <Conversation className="h-[70vh] max-h-[70vh] flex-1 overflow-hidden">
+        <ConversationContent>
+          {messages.length === 0 && status !== "submitted" && (
+            <ConversationEmptyState className="justify-start items-start p-0">
+              <ChatEmpty />
+            </ConversationEmptyState>
+          )}
+          {messages.map((message, messageIndex) => (
+            <Fragment key={messageIndex}>
+              {message.parts.map((part, i) => {
+                switch (part.type) {
+                  case "text":
+                    const isLastMessage =
+                      message.role === "assistant" &&
+                      messageIndex === messages.length - 1 &&
+                      i === message.parts.length - 1;
+                    return (
+                      <TextResponse
+                        key={i}
+                        index={i}
+                        message={message}
+                        partText={part}
+                        isLastMessage={isLastMessage}
+                      />
+                    );
+                  case "tool-CreatePostAgent":
+                    switch (part.state) {
+                      case "input-available":
+                        return <div key={i}>Loading weather...</div>;
+                      case "output-available":
+                        const outputs = part.output as AIToolsPostsOutput[];
                         return (
-                          <TextResponse
-                            key={i}
-                            index={i}
-                            message={message}
-                            partText={part}
-                            isLastMessage={isLastMessage}
-                          />
-                        );
-                      case "tool-CreatePostAgent":
-                        switch (part.state) {
-                          case "input-available":
-                            return <div key={i}>Loading weather...</div>;
-                          case "output-available":
-                            const outputs = part.output as AIToolsPostsOutput[];
-                            return (
-                              <AnimatePresence key={i}>
-                                <motion.div
-                                  className={`grid gap-2 w-full ${
-                                    Show ? "grid-cols-1" : "grid-cols-2"
-                                  }`}
-                                >
-                                  {outputs.map((output, index) => (
-                                    <motion.div
-                                      key={index}
-                                    >
-                                      <PostAffiliate
-                                        images={output.images}
-                                        title={output.title}
-                                        content={output.content}
-                                        category={output.category}
-                                        tags={[""]}
-                                        provider={output.provider}
-                                      />
-                                    </motion.div>
-                                  ))}
+                          <AnimatePresence key={i}>
+                            <motion.div
+                              className={`grid gap-2 w-full ${
+                                Show ? "grid-cols-1" : "grid-cols-2"
+                              }`}
+                            >
+                              {outputs.map((output, index) => (
+                                <motion.div key={index}>
+                                  <PostAffiliate
+                                    images={output.images}
+                                    title={output.title}
+                                    content={output.content}
+                                    category={output.category}
+                                    tags={[""]}
+                                    provider={output.provider}
+                                  />
                                 </motion.div>
-                              </AnimatePresence>
-                            );
-                          default:
-                            return;
-                        }
-                      case "file":
-                        return (
-                          <ImagePreview
-                            i={`${i}`}
-                            message={message}
-                            part={part}
-                          />
-                        );
-                      case "reasoning":
-                        return (
-                          <Reasoning
-                            key={`${message.id}-${i}`}
-                            className="w-full"
-                            isStreaming={i === message.parts.length - 1}
-                          >
-                            <ReasoningTrigger />
-                            <ReasoningContent ref={reasoningRef}>
-                              {part.text}
-                            </ReasoningContent>
-                          </Reasoning>
+                              ))}
+                            </motion.div>
+                          </AnimatePresence>
                         );
                       default:
-                        return null;
+                        return;
                     }
-                  })}
-                </Fragment>
-              ))}
-              <AnimatePresence mode="wait">
-                {status === "submitted" && <ThinkingMessage key="thinking" />}
-              </AnimatePresence>
-              <AnimatePresence>
-                {status === "error" && (
-                  <MessageErrorResponse key={"messageError"} />
-                )}
-              </AnimatePresence>
-            </ConversationContent>
-            <ConversationScrollButton />
-          </Conversation>
+                  case "file":
+                    return (
+                      <ImagePreview i={`${i}`} message={message} part={part} />
+                    );
+                  case "reasoning":
+                    return (
+                      <Reasoning
+                        key={`${message.id}-${i}`}
+                        className="w-full"
+                        isStreaming={
+                          status === "streaming" &&
+                          i === message.parts.length - 1 &&
+                          message.id === messages.at(-1)?.id
+                        }
+                        duration={10}
+                      >
+                        <ReasoningTrigger />
+                        <ReasoningContent ref={reasoningRef}>
+                          {part.text}
+                        </ReasoningContent>
+                      </Reasoning>
+                    );
+                  default:
+                    return null;
+                }
+              })}
+            </Fragment>
+          ))}
+          <AnimatePresence mode="wait">
+            {status === "submitted" && <ThinkingMessage key="thinking" />}
+          </AnimatePresence>
+          <AnimatePresence>
+            {status === "error" && (
+              <MessageErrorResponse key={"messageError"} />
+            )}
+          </AnimatePresence>
+        </ConversationContent>
+        <ConversationScrollButton />
+      </Conversation>
+      {/* <div className="relative size-full max-h-[70vh] h-[70vh]">
+        <div className="flex flex-col h-full">
         </div>
-      </div>
+      </div> */}
       <div className="flex flex-col gap-2 flex-1 sticky bottom-2 w-full bg-background">
         <PromptInputBox
           setgenerateId={setGenerateId}

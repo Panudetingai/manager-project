@@ -7,6 +7,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -20,8 +21,8 @@ import { motion } from "motion/react";
 import { useRef, useState } from "react";
 
 function PostCard() {
-  const [imageIndex, setImageIndex] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [imageIndexes, setImageIndexes] = useState<Record<string, number>>({});
+  const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { workspaceId } = useWorkspaceState();
 
   const posts = useQuery({
@@ -31,37 +32,35 @@ function PostCard() {
     },
   });
 
-  const handleDotClick = (idx: number, images: string[]) => {
-    if (!images) return;
-    setImageIndex(idx);
-    if (scrollRef.current) {
-      const scrollWidth = scrollRef.current.scrollWidth;
-      const childCount = images.length;
-      const scrollTo = (scrollWidth / childCount) * idx;
-      scrollRef.current.scrollTo({
-        left: scrollTo,
-        behavior: "smooth",
-      });
-    }
-  };
+ const handleDotClick = (postId: string, idx: number, images: string[]) => {
+  setImageIndexes((prev) => ({ ...prev, [postId]: idx }));
+  if (scrollRefs.current[postId]) {
+    const scrollWidth = scrollRefs.current[postId].scrollWidth;
+    const childCount = images.length;
+    const scrollTo = (scrollWidth / childCount) * idx;
+    scrollRefs.current[postId].scrollTo({
+      left: scrollTo,
+      behavior: "smooth",
+    });
+  }
+};
 
-  const handleScroll = (images: string[]) => {
+
+  const handleScroll = (postId: string, images: string[]) => {
     if (!images) return;
-    if (scrollRef.current && images?.length > 0) {
-      const scrollLeft = scrollRef.current.scrollLeft;
-      const scrollWidth = scrollRef.current.scrollWidth;
+    if (scrollRefs.current[postId] && images?.length > 0) {
+      const scrollLeft = scrollRefs.current[postId].scrollLeft;
+      const scrollWidth = scrollRefs.current[postId].scrollWidth;
       const childCount = images.length;
       const idx = Math.round((scrollLeft / scrollWidth) * childCount);
-      setImageIndex(idx);
+      setImageIndexes((prev) => ({ ...prev, [postId]: idx }));
     }
   };
 
-  if (!posts.data) return "no Posts!";
+  if (posts.isPending) return <PostCardLoading />;
+  if (!posts.data && !posts.isPending) return <PostCardEmpty />;
 
-  const imageisArray = posts.data.map((i) =>
-    typeof i.images === "string" ? JSON.parse(i.images) : i.images
-  );
-
+  console.log("post data Array", posts.data)
   return (
     <>
       {posts.data.map((post) => (
@@ -71,23 +70,23 @@ function PostCard() {
         >
           <CardHeader>
             <div
-              ref={scrollRef}
+              ref={el => { scrollRefs.current[post.id] = el; }}
               onScroll={() =>
-                Array.isArray(post.images) && handleScroll(post.images)
+                Array.isArray(post.images) && handleScroll(post.id, post.images)
               }
               className="snap-x flex gap-2 overflow-x-scroll scroll-none"
             >
-              {imageisArray.map((images) =>
-                images.map((image: string, index: number) => (
-                  <div key={index} className="snap-center w-full">
+              {post.images &&
+                Array.isArray(post.images) &&
+                post.images.map((img, idx) => (
+                  <div key={idx} className="snap-center w-full">
                     <motion.img
-                      src={image}
-                      alt={`Post Image ${index + 1}`}
+                      src={img}
+                      alt={`Post Image ${idx + 1}`}
                       className={`w-full min-w-[18rem] h-62 object-cover rounded-md mb-4 transition-transform duration-500 ease-in-out`}
                     />
                   </div>
-                ))
-              )}
+                ))}
             </div>
             {post.images && post.images.length > 1 && (
               <div className="flex justify-center items-center gap-2 mt-2">
@@ -96,13 +95,13 @@ function PostCard() {
                     <button
                       key={idx}
                       className={`w-2 h-2 rounded-full transition-all ${
-                        imageIndex === idx
+                        (imageIndexes[post.id] ?? 0) === idx
                           ? "bg-primary scale-110"
                           : "bg-muted-foreground opacity-50"
                       }`}
                       onClick={() =>
                         Array.isArray(post.images) &&
-                        handleDotClick(idx, post.images)
+                        handleDotClick(post.id, idx, post.images)
                       }
                       aria-label={`Go to image ${idx + 1}`}
                     />
@@ -125,24 +124,14 @@ function PostCard() {
             </div>
           </CardContent>
           <CardFooter className="border-t flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <motion.img
-                className="w-6 h-6 rounded-full"
-                src="https://images.seeklogo.com/logo-png/60/2/groq-icon-logo-png_seeklogo-605779.png"
-                alt="Groq"
-              />
-              <span className="text-muted-foreground font-medium">
-                {post.provider}
-              </span>
-            </div>
             <div className="flex items-center gap-4">
               <span className="text-xs text-muted-foreground">12 comments</span>
               <span className="text-xs text-muted-foreground">24 likes</span>
+            </div>
               <Button variant="ghost" size="sm">
                 Share
                 <SendHorizonal size={8} />
               </Button>
-            </div>
           </CardFooter>
         </Card>
       ))}
@@ -184,5 +173,27 @@ function PostContent({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-col gap-4">{children}</div>;
 }
 
-export { PostBody, PostCard, PostCardHeader, PostContent, PostTitle };
+function PostCardEmpty() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full text-center gap-4">
+      <h3 className="text-xl font-semibold">No Posts Available</h3>
+      <p className="text-muted-foreground">
+        There are currently no posts to display. Please check back later or
+        create a new post.
+      </p>
+    </div>
+  );
+}
+
+function PostCardLoading() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full text-center gap-4">
+      {Array.from({length: 3}).map((_, idx) => (
+        <Skeleton key={idx} className="w-full h-52 rounded-md" />
+      ))}
+    </div>
+  )
+}
+
+export { PostBody, PostCard, PostCardEmpty, PostCardHeader, PostContent, PostTitle };
 

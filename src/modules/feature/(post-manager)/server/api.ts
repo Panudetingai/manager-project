@@ -54,6 +54,13 @@ export async function getPostManagerFeatureApi(workspaceId: string) {
       throw error;
     }
 
+    // convert images from string to array
+    data?.forEach((post) => {
+      if (typeof post.images === "string") {
+        post.images = JSON.parse(post.images);
+      }
+    });
+
     return data;
   } catch (error) {
     throw error;
