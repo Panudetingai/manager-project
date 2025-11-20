@@ -9,7 +9,7 @@ type AIServiceTypeParameters = Parameters<typeof streamText>[0];
 
 export type AIServiceTypeOption = {
   id: string;
-  typeai: ModelsType["type"];
+  typeai: ModelsType["chefSlug"];
   generatetype: "chat" | "think" | "search";
   options: AIServiceTypeParameters;
   messages: UIMessage[];
@@ -18,7 +18,7 @@ export type AIServiceTypeOption = {
 type AIServiceReturen = ClauneAIService | GeminiService | OpenRouterService | GroqService;
 
 class AIService {
-  private typeai: ModelsType["type"];
+  private typeai: ModelsType["chefSlug"];
   private options: AIServiceTypeParameters;
 
   constructor(options: AIServiceTypeOption) {

@@ -114,6 +114,54 @@ export type Database = {
           },
         ]
       }
+      posts: {
+        Row: {
+          category: string | null
+          content: string | null
+          id: string
+          images: string | null
+          provider: string | null
+          title: string | null
+          user_owner_id: string
+          workspace_owner_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          id?: string
+          images?: string | null
+          provider?: string | null
+          title?: string | null
+          user_owner_id?: string
+          workspace_owner_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          id?: string
+          images?: string | null
+          provider?: string | null
+          title?: string | null
+          user_owner_id?: string
+          workspace_owner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_owner_id_fkey"
+            columns: ["user_owner_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_workspace_owner_id_fkey"
+            columns: ["workspace_owner_id"]
+            isOneToOne: false
+            referencedRelation: "workspace"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_key_config: {
         Row: {
           category: Database["public"]["Enums"]["social"] | null
@@ -146,7 +194,7 @@ export type Database = {
           {
             foreignKeyName: "social_key_config_workspace_id_fkey"
             columns: ["workspace_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "workspace"
             referencedColumns: ["id"]
           },

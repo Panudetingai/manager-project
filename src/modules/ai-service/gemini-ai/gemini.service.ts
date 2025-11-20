@@ -1,6 +1,8 @@
 import { GoogleModelId } from "@/modules/feature/types/ai-service/ai-service-type";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText, UIMessage } from "ai";
+import { SystemPrompts } from "../prompts";
+import { CreatePostAgent } from "../tools/create-post-agent";
 
 interface GeminiConfig {
   apiKey?: string;
@@ -13,7 +15,8 @@ interface OptionParameter {
 }
 
 class GeminiService {
-  private static readonly DEFAULT_API_URL = "https://generativelanguage.googleapis.com/v1beta";
+  private static readonly DEFAULT_API_URL =
+    "https://generativelanguage.googleapis.com/v1beta";
   private apiKey = process.env.GOOGLE_API_KEY;
   private apiUrl = GeminiService.DEFAULT_API_URL || undefined;
 
@@ -41,7 +44,7 @@ class GeminiService {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant.",
+          content: SystemPrompts.PromptDefault,
         },
         {
           role: "user",
@@ -52,6 +55,8 @@ class GeminiService {
             .join("\n"),
         },
       ],
+      toolChoice: "auto",
+      tools: { CreatePostAgent },
     });
     return result;
   }

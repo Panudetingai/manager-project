@@ -3,7 +3,9 @@ import {
   OptionParameter,
 } from "@/modules/feature/types/ai-service/ai-service-type";
 import { createGroq } from "@ai-sdk/groq";
-import { streamText } from "ai";
+import { streamText, Tool } from "ai";
+import { SystemPrompts } from "../prompts";
+import { Tools } from "./func/groq";
 
 interface GroqConfig {
   apiurl?: string;
@@ -40,7 +42,7 @@ class GroqService {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant.",
+          content: SystemPrompts.PromptDefault,
         },
         {
           role: "user",
@@ -69,13 +71,8 @@ class GroqService {
           ],
         },
       ],
-      providerOptions: {
-        groq: {
-          structuredOutputs: false
-        },
-      },
+      tools: Tools(paramater.option.model) as Record<string, Tool<unknown, unknown>>,
     });
-
     return result;
   }
 }

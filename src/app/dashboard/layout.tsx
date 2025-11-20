@@ -19,7 +19,7 @@ export default async function LayoutDashboardProject({
   return (
     <SidebarProvider>
       <AppSidebar role={userRole || "guest"} />
-      <main className="w-full rounded-sm">
+      <main className="w-full rounded-sm overflow-x-hidden">
         <SocketProvider userId={user.id}>
           <AppHeader />
           <div className="p-4 relative">{children}</div>

@@ -1,5 +1,6 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText, UIMessage } from "ai";
+import { CreatePostAgent } from "../tools/create-post-agent";
 
 interface OpenRouterServiceConfig {
     apiKey?: string;
@@ -50,6 +51,8 @@ class OpenRouterService {
                         .join("\n"),
                 }
             ],
+            toolChoice: "auto",
+            tools: { CreatePostAgent },
             providerOptions: {
                 openrouter: {
                     reasoning: {

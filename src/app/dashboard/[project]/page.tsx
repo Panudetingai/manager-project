@@ -34,9 +34,7 @@ export default async function Page() {
               </p>
             </PostCardHeader>
             <PostBody>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <PostCard key={index} />
-              ))}
+              <PostCard />
             </PostBody>
           </PostContent>
         </PostLayout>

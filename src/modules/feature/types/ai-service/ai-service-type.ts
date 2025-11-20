@@ -14,7 +14,9 @@ export type OpenrouterModelId = IdFromChat<ReturnType<typeof createOpenRouter>["
 export type ModelsType = {
   id: GoogleModelId | AnthropicModelId | GroqModelId | FirecrawlModelId;
   name: string;
-  type: "gemini" | "anthropic" | "openrouter" | "groq" | "firecrawl";
+  chef: string;
+  chefSlug: string;
+  providers: ("openai" | "anthropic" | "gemini" | "groq" | "firecrawl" | "openrouter")[];
   modelIcon?: string
 };
 
@@ -23,4 +25,13 @@ export interface OptionParameter {
   message_id: string;
   option: Parameters<typeof streamText>[0];
   messages: UIMessage[];
+}
+
+export interface AIToolsPostsOutput {
+  images: string[];
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+  provider: string;
 }
