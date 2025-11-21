@@ -7,15 +7,16 @@ import { useState } from "react";
 
 interface ImagePreviewProps {
   i: string;
-  message: UIMessage;
+  id: string;
+  role: UIMessage["role"];
   part: FileUIPart;
 }
 
-export default function ImagePreview({ i, message, part }: ImagePreviewProps) {
+export default function ImagePreview({ i, id, part, role }: ImagePreviewProps) {
   const [preview, setPreview] = useState(false);
   return (
     <>
-      <Message key={`${message.id}-${i}`} from={message.role}>
+      <Message key={`${id}-${i}`} from={role}>
         <MessageContent
           onClick={() => setPreview(true)}
           className="p-0 border shadow cursor-zoom-in"

@@ -11,7 +11,7 @@ import {
   ReasoningTrigger,
 } from "@/components/ai-elements/reasoning";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, UIDataTypes, UIMessage, UITools } from "ai";
 import { AnimatePresence, motion } from "motion/react";
 import { redirect, useParams } from "next/navigation";
 import React, { Fragment, useEffect, useState } from "react";
@@ -109,8 +109,13 @@ function ChatBox({ params }: ChatBoxProps) {
   useEffect(() => {
     if (!getConversation) return;
     if (getConversation.data?.messages) {
-      // eslint-disable-next-line
-      setMessages(getConversation.data.messages as any);
+      setMessages(
+        getConversation.data.messages as unknown as UIMessage<
+          unknown,
+          UIDataTypes,
+          UITools
+        >[]
+      );
     }
     // eslint-disable-next-line
   }, [params?.id, getConversation?.data?.messages]);
@@ -122,9 +127,7 @@ function ChatBox({ params }: ChatBoxProps) {
   console.log(messages);
 
   return (
-    <div
-      className={`relative h-full`}
-    >
+    <div className={`relative h-full`}>
       <Conversation className="h-[70vh] max-h-[70vh] flex-1 overflow-hidden">
         <ConversationContent>
           {messages.length === 0 && status !== "submitted" && (
@@ -132,25 +135,25 @@ function ChatBox({ params }: ChatBoxProps) {
               <ChatEmpty />
             </ConversationEmptyState>
           )}
-          {messages.map((message, messageIndex) => (
+          {messages.map(({ id, parts, role }, messageIndex) => (
             <Fragment key={messageIndex}>
-              {message.parts.map((part, i) => {
+              {parts.map((part, i) => {
                 switch (part.type) {
                   case "text":
                     const isLastMessage =
-                      message.role === "assistant" &&
+                      role === "assistant" &&
                       messageIndex === messages.length - 1 &&
-                      i === message.parts.length - 1;
+                      i === parts.length - 1;
                     return (
                       <TextResponse
                         key={i}
-                        index={i}
-                        message={message}
-                        partText={part}
+                        role={role}
+                        id={id}
+                        partText={part.text}
                         isLastMessage={isLastMessage}
                       />
                     );
-                  case "tool-CreatePostAgent":
+                  case "tool-createPostAgent":
                     switch (part.state) {
                       case "input-available":
                         return <div key={i}>Loading weather...</div>;
@@ -183,17 +186,22 @@ function ChatBox({ params }: ChatBoxProps) {
                     }
                   case "file":
                     return (
-                      <ImagePreview i={`${i}`} message={message} part={part} />
+                      <ImagePreview
+                        role={role}
+                        id={id}
+                        i={`${i}`}
+                        part={part}
+                      />
                     );
                   case "reasoning":
                     return (
                       <Reasoning
-                        key={`${message.id}-${i}`}
+                        key={`${id}-${i}`}
                         className="w-full"
                         isStreaming={
                           status === "streaming" &&
-                          i === message.parts.length - 1 &&
-                          message.id === messages.at(-1)?.id
+                          i === parts.length - 1 &&
+                          id === messages.at(-1)?.id
                         }
                         duration={10}
                       >

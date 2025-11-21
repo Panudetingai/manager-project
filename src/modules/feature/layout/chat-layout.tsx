@@ -31,8 +31,6 @@ export default function Chatlayout({ params }: ChatlayoutProps) {
         <motion.div
           key="chat-box"
           initial={{ flex: 1 }}
-          //   animate={{ flex: Show ? 1 : 2 }}
-          //   transition={{ duration: 0.7 }}
           className="flex-1 duration-150 transition-all"
         >
           <ChatBox params={{ id: params?.id }} />

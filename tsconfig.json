@@ -10,6 +10,8 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -24,7 +26,8 @@
     ],
     "paths": {
       "@/*": [
-        "./src/*"
+        "./src/*",
+        "./*"
       ]
     }
   },
