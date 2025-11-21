@@ -135,7 +135,7 @@ const PromptInputBox = ({
   generateId,
 }: PromptInputBoxProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [model, setModel] = useState<string>(models[0].id);
+  const [model, setModel] = useState<string>(models[7].id);
   const { setModal, modal, modalType, setModalType } = useChatControls();
   const {project} = useParams();
   const pathChat = crypto.randomUUID();

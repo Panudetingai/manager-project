@@ -5,56 +5,38 @@ import {
   MessageContent,
   MessageResponse,
 } from "@/components/ai-elements/message";
-import { TextUIPart, UIDataTypes, UIMessage, UITools } from "ai";
+import { UIMessage } from "ai";
 import { CopyIcon, RefreshCcwIcon, SparklesIcon } from "lucide-react";
 import { motion } from "motion/react";
 import React, { Fragment } from "react";
 import { useChatStore } from "../store/ai-service/chatStore";
+import { normalizeMarkdown } from "../utils/sanitizeText";
+
 type Props = {
-  message: UIMessage<unknown, UIDataTypes, UITools>;
-  partText: TextUIPart;
-  index: number;
+  id: string;
+  role: UIMessage["role"];
+  partText: string;
   // regenerate: () => void;
   isLastMessage: boolean;
 };
 
-export const markdown = `React hooks are special functions that let you use React features in function components. The most common ones are:
-
-- **useState** - for managing component state
-- **useEffect** - for side effects like data fetching
-- **useContext** - for consuming context values
-- **useRef** - for accessing DOM elements
-
-Here's a simple example:
-
-\`\`\`jsx
-function Counter() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <button onClick={() => setCount(count + 1)}>
-      Clicked {count} times
-    </button>
-  );
-}
-\`\`\`
-
-Which specific hook would you like to learn more about?`;
+export const markdown = `Hello...\\n\\n\`\`\`python\\nprint(1)\\n\`\`\``;
 
 function TextResponse({
-  index,
-  message,
+  role,
+  id,
   partText,
   // regenerate,
   isLastMessage,
 }: Props) {
-  console.log(partText.text);
 
   return (
-    <Fragment key={index}>
-      <Message from={message.role}>
-        <MessageContent key={message.id}>
-          <MessageResponse>{partText.text}</MessageResponse>
+    <Fragment>
+      <Message from={role}>
+        <MessageContent>
+          <MessageResponse>
+            {normalizeMarkdown(partText)}
+          </MessageResponse>
         </MessageContent>
       </Message>
       {isLastMessage && (
@@ -63,7 +45,7 @@ function TextResponse({
             <RefreshCcwIcon className="size-3" />
           </MessageAction>
           <MessageAction
-            onClick={() => navigator.clipboard.writeText(partText.text)}
+            onClick={() => navigator.clipboard.writeText(partText)}
             label="Copy"
           >
             <CopyIcon className="size-3" />
