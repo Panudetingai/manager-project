@@ -17,7 +17,6 @@ export async function createPostManagerFeatureApi(
     if (!user) {
       throw new Error("User not authenticated");
     }
-    console.log(JSON.stringify(payload, null, 2));
     const { error } = await supabase.from("posts").insert({
       title: payload.title,
       content: payload.content,
@@ -48,7 +47,7 @@ export async function getPostManagerFeatureApi(workspaceId: string) {
       .from("posts")
       .select("*")
       .eq("workspace_owner_id", workspaceId)
-      .eq("user_owner_id", user.id)
+      .eq("user_owner_id", user.id);
 
     if (error) {
       throw error;

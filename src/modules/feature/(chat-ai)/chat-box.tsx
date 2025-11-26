@@ -108,9 +108,12 @@ function ChatBox({ params }: ChatBoxProps) {
 
   useEffect(() => {
     if (!getConversation) return;
-    if (getConversation.data?.messages) {
+    const conversation = Array.isArray(getConversation.data)
+      ? getConversation.data[0]
+      : getConversation.data;
+    if (conversation?.messages) {
       setMessages(
-        getConversation.data.messages as unknown as UIMessage<
+        conversation.messages as unknown as UIMessage<
           unknown,
           UIDataTypes,
           UITools
