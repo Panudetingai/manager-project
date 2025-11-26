@@ -18,11 +18,12 @@ const PathsSchema = z.object({
     workspaceBilling: z.string().min(1),
     workspaceBillingReturn: z.string().min(1),
     onboarding: z.string().min(1),
-    join: z.string().min(1)
+    join: z.string().min(1),
   }),
   feature: z.object({
     aichat: z.string().min(1),
     postManager: z.string().min(1),
+    messageBox: z.string().min(1),
   }),
   join: z.object({
     menubarjoin: z.string().min(1),
@@ -31,7 +32,7 @@ const PathsSchema = z.object({
     workspaceSettingsSocialAccountsInstagram: z.string().min(1),
     workspaceSettingsSocialAccountsFacebook: z.string().min(1),
     workspaceSettingsSocialAccountsLineAPI: z.string().min(1),
-  })
+  }),
 });
 
 const pathsConfig = PathsSchema.parse({
@@ -60,12 +61,16 @@ const pathsConfig = PathsSchema.parse({
   feature: {
     aichat: "/dashboard/[workspace]/ai-chat",
     postManager: "/dashboard/[workspace]/posts",
+    messageBox: "/dashboard/[workspace]/message",
   },
   setting: {
-    workspaceSettingsSocialAccountsLineAPI: "/dashboard/[workspace]/settings/social-accounts/line",
-    workspaceSettingsSocialAccountsFacebook: "/dashboard/[workspace]/settings/social-accounts/facebook",
-    workspaceSettingsSocialAccountsInstagram: "/dashboard/[workspace]/settings/social-accounts/instagram",
-  }
+    workspaceSettingsSocialAccountsLineAPI:
+      "/dashboard/[workspace]/settings/social-accounts/line",
+    workspaceSettingsSocialAccountsFacebook:
+      "/dashboard/[workspace]/settings/social-accounts/facebook",
+    workspaceSettingsSocialAccountsInstagram:
+      "/dashboard/[workspace]/settings/social-accounts/instagram",
+  },
 } satisfies z.infer<typeof PathsSchema>);
 
 export default pathsConfig;

@@ -1,8 +1,22 @@
-import { CirclePlus, CreditCard, Facebook, Instagram, LayoutDashboard, LucideIcon, Send, Settings2, SettingsIcon, SparkleIcon, SquareM, Users2, UsersRound } from "lucide-react";
+import {
+  CirclePlus,
+  CreditCard,
+  Facebook,
+  Inbox,
+  Instagram,
+  LayoutDashboard,
+  LucideIcon,
+  Send,
+  Settings2,
+  SettingsIcon,
+  SparkleIcon,
+  SquareM,
+  Users2,
+  UsersRound,
+} from "lucide-react";
 import z from "zod";
 import pathsConfig from "../../../../config/app.router";
 import { Database } from "../../../../utils/supabase/database.types";
-
 
 type Role = Database["public"]["Enums"]["user_roles"];
 
@@ -62,7 +76,7 @@ export const APP_ROUTE: AppRoute[] = [
             label: "Groups",
             path: pathsConfig.app.workspaceMembersGroups,
             icon: UsersRound,
-          }
+          },
         ],
       },
       {
@@ -78,7 +92,7 @@ export const APP_ROUTE: AppRoute[] = [
         icon: CreditCard,
         role: ["user", "owner", "admin"],
         submenu: [],
-      }
+      },
     ],
   },
   {
@@ -96,8 +110,14 @@ export const APP_ROUTE: AppRoute[] = [
         path: pathsConfig.feature.postManager,
         icon: Send,
         role: ["owner", "admin", "user"],
-      }
-    ]
+      },
+      {
+        label: "Message Box",
+        path: pathsConfig.feature.messageBox,
+        icon: Inbox,
+        role: ["owner", "admin", "user"],
+      },
+    ],
   },
   {
     labelgroup: "Settings",
@@ -123,11 +143,11 @@ export const APP_ROUTE: AppRoute[] = [
             label: "Instagram API",
             icon: Instagram,
             path: pathsConfig.setting.workspaceSettingsSocialAccountsInstagram,
-          }
+          },
         ],
-      }
+      },
     ],
-  }
+  },
 ];
 const appRoutesSchema = z.array(approuter);
 appRoutesSchema.parse(APP_ROUTE);

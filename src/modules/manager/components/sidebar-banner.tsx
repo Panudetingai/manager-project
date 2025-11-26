@@ -20,12 +20,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getUserClient } from "@/lib/supabase/getUser-client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import * as LucideIcons from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { elysia } from "../../../../config/eylsia.config";
 import { createClient } from "../../../../utils/supabase/client";
+import { adminworkspaceUpdate } from "../server/admin-workspace";
 import { useWorkspaceState } from "../store/workspace-state";
 import CreateWorkspaceForm from "./create-workspace";
 
@@ -87,6 +88,19 @@ export function SidebarBanner() {
     },
     enabled: !!user?.id && !!project,
     staleTime: Infinity,
+  });
+
+  const mutate = useMutation({
+    mutationFn: async ({
+      data,
+    }: {
+      data: { workspaceId: string; workspaceName: string };
+    }) => {
+      await adminworkspaceUpdate({
+        workspaceId: data.workspaceId,
+        workspaceName: data.workspaceName,
+      });
+    },
   });
 
   useEffect(() => {
@@ -158,6 +172,12 @@ export function SidebarBanner() {
                       project === workspace.name ? "font-medium" : ""
                     }`}
                     onClick={() => {
+                      mutate.mutate({
+                        data: {
+                          workspaceId: workspace.id,
+                          workspaceName: workspace.name,
+                        },
+                      });
                       router.push(`/dashboard/${workspace.name}`);
                     }}
                   >

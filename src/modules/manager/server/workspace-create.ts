@@ -21,7 +21,6 @@ export async function createWorkspaceAPI(data: FormWorkspaceType) {
     .single();
 
   if (error) throw new Error("Create workspace failed");
-
   await redis.del(`workspaces:${user.id}`);
   return workspace;
 }

@@ -13,10 +13,12 @@ const workspace = new Elysia().get("/workspaces", async () => {
   const supabase = await createClient();
   const user = await getUserServer();
   if (!user) return [];
-  
+
   const cacheKey = `workspaces:${user.id}`;
-  const cached = await redis.get(cacheKey) as string | null;
-  if (cached) return cached as unknown as workspacesType[];
+  const cached = (await redis.get(cacheKey)) as string | null;
+  if (cached) {
+    return cached as unknown as workspacesType[];
+  }
 
   const { data: workspaces, error } = await supabase
     .from("workspace")
