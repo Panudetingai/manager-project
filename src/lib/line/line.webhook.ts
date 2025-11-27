@@ -1,6 +1,11 @@
+import { GroqService } from "@/modules/ai-service/groq-ai/groq.service";
+import { SystemPromptsLine } from "@/modules/ai-service/prompts";
+import { GroqModelId } from "@/modules/feature/types/ai-service/ai-service-type";
 import { LineService } from "@/modules/line-service/line.service";
 import { createfollowWebhook } from "@/modules/line-service/service/action/line";
+
 import { FollowEvent, webhookEvent } from "@/modules/line-service/types/type";
+import { generateText } from "ai";
 import crypto from "crypto";
 
 export class LineWebhook {
@@ -24,7 +29,7 @@ export class LineWebhook {
           } else if (event.message?.type === "sticker") {
             await this.handleTextMessage(event);
           } else if (event.message?.type === "follow") {
-            await await this.handleFollow(event);
+            await this.handleFollow(event);
           }
           break;
       }
@@ -38,17 +43,35 @@ export class LineWebhook {
     const text = event.message?.text;
     const replyToken = event.replyToken;
 
+    const groqService = new GroqService();
+    const groq = groqService.createGrop();
+
     console.log(`User ${userId} sent: ${text}`);
 
     if (!replyToken || !text) {
       console.error("Missing replyToken or text in the event");
       return;
     }
+
+    // AI integration can be added here
+    const aiResponse = await generateText({
+      model: groq("qwen/qwen3-32b" as GroqModelId),
+      system: SystemPromptsLine.PromptDefault,
+      prompt: text,
+      providerOptions: {
+        groq: {
+          reasoningFormat: "hidden",
+          reasoningEffort: "none",
+        },
+      },
+      maxOutputTokens: 500,
+    });
+
     // Example: Echo back
     await LineService.replyMessage(replyToken, [
       {
         type: "text",
-        text: `You said: ${text}`,
+        text: `${aiResponse.text}`,
       },
     ]);
   }
