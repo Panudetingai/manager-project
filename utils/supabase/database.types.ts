@@ -79,6 +79,63 @@ export type Database = {
           },
         ]
       }
+      line_follow_event: {
+        Row: {
+          id: string
+          isRedelivery: boolean | null
+          isUnblocked: boolean
+          mode: string | null
+          replyToken: string | null
+          timestamp: string | null
+          type: string | null
+          user_owner_id: string | null
+          userId: string | null
+          webhookEventId: string | null
+          workspace_owner_id: string | null
+        }
+        Insert: {
+          id?: string
+          isRedelivery?: boolean | null
+          isUnblocked: boolean
+          mode?: string | null
+          replyToken?: string | null
+          timestamp?: string | null
+          type?: string | null
+          user_owner_id?: string | null
+          userId?: string | null
+          webhookEventId?: string | null
+          workspace_owner_id?: string | null
+        }
+        Update: {
+          id?: string
+          isRedelivery?: boolean | null
+          isUnblocked?: boolean
+          mode?: string | null
+          replyToken?: string | null
+          timestamp?: string | null
+          type?: string | null
+          user_owner_id?: string | null
+          userId?: string | null
+          webhookEventId?: string | null
+          workspace_owner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "line_follow_event_user_owner_id_fkey"
+            columns: ["user_owner_id"]
+            isOneToOne: false
+            referencedRelation: "account"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "line_follow_event_workspace_owner_id_fkey"
+            columns: ["workspace_owner_id"]
+            isOneToOne: false
+            referencedRelation: "workspace"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding: {
         Row: {
           created_at: string

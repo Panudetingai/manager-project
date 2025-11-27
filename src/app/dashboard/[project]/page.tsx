@@ -6,24 +6,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  PostBody,
-  PostCard,
-  PostCardHeader,
-  PostContent,
-  PostTitle,
-} from "@/modules/manager/overview/components/cards/post-card";
-import {
   AlreadyPosted,
   PostCount,
   RemainingPosts,
 } from "@/modules/manager/overview/components/cards/post-count";
-import PostLayout from "@/modules/manager/overview/components/layout/post-layout";
 import Posttable from "@/modules/manager/overview/components/table/post-table";
 
 export default async function Page() {
   return (
     <div className="flex min-h-screen w-full gap-4">
-      <div className="flex-1 w-full">
+      {/* <div className="flex-1 w-full">
         <PostLayout>
           <PostContent>
             <PostCardHeader>
@@ -38,7 +30,7 @@ export default async function Page() {
             </PostBody>
           </PostContent>
         </PostLayout>
-      </div>
+      </div> */}
       <div className="flex-2 space-y-4">
         <div className="flex w-full gap-2">
           <PostCount />

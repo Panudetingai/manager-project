@@ -26,7 +26,7 @@ class GroqService {
     }
   }
 
-  private createGrop() {
+  public createGrop() {
     const client = createGroq({
       apiKey: this.apikey,
       baseURL: this.apiurl,
@@ -71,7 +71,10 @@ class GroqService {
           ],
         },
       ],
-      tools: Tools(paramater.option.model) as Record<string, Tool<unknown, unknown>>,
+      tools: Tools(paramater.option.model) as Record<
+        string,
+        Tool<unknown, unknown>
+      >,
     });
     return result;
   }
@@ -82,4 +85,3 @@ const useGroqService = (config: GroqConfig) => {
 };
 
 export { GroqService, useGroqService };
-

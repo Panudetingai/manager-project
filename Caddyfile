@@ -1,0 +1,7 @@
+panudetingai.app.local {
+    reverse_proxy localhost:3000
+
+    handle /api/* {
+        reverse_proxy localhost:3000
+    }
+}

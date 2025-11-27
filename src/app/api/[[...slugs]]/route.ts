@@ -1,6 +1,7 @@
 import webhook from "@/lib/stripe/api";
 import AIServiceAPI from "@/modules/ai-service/server/route";
 import { default as auth_callback } from "@/modules/auth/server/route";
+import { webhook_line } from "@/modules/line-service/service/server/api";
 import workspace from "@/modules/manager/server/routes/workspace";
 import { cors } from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
@@ -19,6 +20,7 @@ const app = new Elysia({ prefix: "/api" })
   .use(auth_callback)
   .use(workspace)
   .use(webhook)
+  .use(webhook_line)
   .use(swagger())
   .group("/ai-service", (app) => app.use(AIServiceAPI));
 

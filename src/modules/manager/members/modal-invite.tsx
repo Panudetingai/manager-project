@@ -55,14 +55,19 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
       user_owner_id: userId,
     }: InviteMemberparams) => {
       setLoadingUserId(userId);
-      return await inviteMember({ workspace_owner_id: workspaceId, user_owner_id: userId });
-    }, onSuccess: async () => {
+      return await inviteMember({
+        workspace_owner_id: workspaceId,
+        user_owner_id: userId,
+      });
+    },
+    onSuccess: async () => {
       setLoadingUserId(null);
       await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       setisopen(false);
-    }, onError: () => {
+    },
+    onError: () => {
       setLoadingUserId(null);
-    }
+    },
   });
 
   return (
@@ -79,7 +84,7 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <div className="flex flex-col gap-2 h-52">
+        <div className="flex flex-col gap-2 h-52 overflow-hidden overflow-y-auto scroll-custom">
           {/* List member search result */}
           {users && users.length > 0 ? (
             <>
@@ -91,7 +96,9 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
                         src={user.avatar_url || ""}
                         alt={user.username || "user"}
                       />
-                      <AvatarFallback>{user.username?.slice(0, 1)}</AvatarFallback>
+                      <AvatarFallback>
+                        {user.username?.slice(0, 1)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="text-muted-foreground text-sm">
                       {user.username}
@@ -101,10 +108,12 @@ export default function ModalInvite({ isopen, setisopen }: Props) {
                     className="rounded-sm cursor-pointer"
                     disabled={loadingUserId === user.id}
                     size={"sm"}
-                    onClick={() => mutate({
-                      workspace_owner_id: workspaceId || "",
-                      user_owner_id: user.id,
-                    })}
+                    onClick={() =>
+                      mutate({
+                        workspace_owner_id: workspaceId || "",
+                        user_owner_id: user.id,
+                      })
+                    }
                   >
                     {loadingUserId === user.id ? (
                       <>
